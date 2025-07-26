@@ -62,7 +62,7 @@ export const EMAIL_VERIFY_TEMPLATE = `
     <tbody>
       <tr>
         <td valign="top" align="center">
-          <table class="container" width="600" cellspacing="0" cellpadding="0" border="0">
+          <table class="container" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:500px;">
             <tbody>
               <tr>
                 <td class="main-content">
@@ -173,7 +173,7 @@ export const PASSWORD_RESET_TEMPLATE = `
     <tbody>
       <tr>
         <td valign="top" align="center">
-          <table class="container" width="600" cellspacing="0" cellpadding="0" border="0">
+          <table class="container" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:500px;">
             <tbody>
               <tr>
                 <td class="main-content">

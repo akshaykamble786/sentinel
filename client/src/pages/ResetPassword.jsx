@@ -1,6 +1,6 @@
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   InputOTP,
@@ -18,50 +18,65 @@ const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [isEmailSent, setIsEmailSent] = useState(false);
-  const [isOtpSubmitted, setIsOtpSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { backendUrl } = useContext(AppContext);
+  const { backendUrl, isLoggedIn, userData } = useContext(AppContext);
 
-  axios.defaults.withCredentials = true;
+  // axios.defaults.withCredentials = true;
 
   const onSubmitEmail = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const { data } = await axios.post(backendUrl + "/auth/send-reset-otp", {
         email,
       });
       data.success ? toast.success(data.message) : toast.error(data.message);
-      data.success && setIsEmailSent(true)
+      data.success && setIsEmailSent(true);
     } catch (error) {
-      toast.error(error.message);
+      toast.error(
+        error.response?.data?.message || "Failed to send reset email"
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const onSubmitOtp = async (e) => {
+  const onSubmitReset = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
-      setOtp(otp);
-      setIsOtpSubmitted(true);
+      const { data } = await axios.post(backendUrl + "/auth/reset-password", {
+        email,
+        otp,
+        newPassword,
+      });
+      if (data.success) {
+        toast.success(data.message);
+        navigate("/login");
+      } else {
+        toast.error(data.message || "Failed to reset password");
+      }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || "Failed to reset password");
+    } finally {
+      setIsLoading(false);
     }
-  }
+  };
 
-  const onSubmitNewPassword = async (e) =>{
-    e.preventDefault();
-    try {
-      const { data } = await axios.post(backendUrl + '/auth/reset-password', {email, otp, newPassword})
-      data.success ? toast.success(data.message) : toast.error(data.message);
-      data.success && navigate('/login')
-    } catch (error) {
-      toast.error(error.message);
+  useEffect(() => {
+    if (isLoggedIn && userData && userData.isAccountVerified) {
+      navigate("/dashboard")
     }
-  }
+  }, [isLoggedIn, userData])
 
   return (
     <div>
       {!isEmailSent && (
-        <form onSubmit={onSubmitEmail} className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+        <form
+          onSubmit={onSubmitEmail}
+          className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md"
+        >
           <h1 className="text-2xl font-bold mb-4">Reset Password</h1>
           <p className="mb-4">Enter your email to reset your password</p>
           <Input
@@ -75,16 +90,20 @@ const ResetPassword = () => {
           <Button
             type="submit"
             className="w-full bg-blue-500 text-white p-2 rounded-md"
+            disabled={isLoading}
           >
-            Reset Password
+            {isLoading ? "Sending..." : "Reset Password"}
           </Button>
         </form>
       )}
 
-      {!isOtpSubmitted && isEmailSent && (
-        <form onSubmit={onSubmitOtp} className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
-          <h1 className="text-2xl font-bold mb-4">Reset Password OTP</h1>
-          <p className="mb-4">Enter the 6-digit code sent to your email id</p>
+      {isEmailSent && (
+        <form
+          onSubmit={onSubmitReset}
+          className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md"
+        >
+          <h1 className="text-2xl font-bold mb-4">Reset Password</h1>
+          <p className="mb-4">Enter the 6-digit OTP sent to your email and your new password</p>
           <InputOTP maxLength={6} required value={otp} onChange={setOtp}>
             <InputOTPGroup>
               <InputOTPSlot index={0} required />
@@ -98,14 +117,6 @@ const ResetPassword = () => {
               <InputOTPSlot index={5} required />
             </InputOTPGroup>
           </InputOTP>
-          <Button type="submit">Submit</Button>
-        </form>
-      )}
-
-      {isOtpSubmitted && isEmailSent && (
-        <form onSubmit={onSubmitNewPassword} className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
-          <h1 className="text-2xl font-bold mb-4">New Password</h1>
-          <p className="mb-4">Enter your new password</p>
           <Input
             type="password"
             placeholder="New Password"
@@ -117,8 +128,9 @@ const ResetPassword = () => {
           <Button
             type="submit"
             className="w-full bg-blue-500 text-white p-2 rounded-md"
+            disabled={isLoading}
           >
-            Submit
+            {isLoading ? "Submitting..." : "Submit"}
           </Button>
         </form>
       )}

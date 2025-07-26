@@ -24,7 +24,7 @@ export default function AuthForm({ className, ...props }) {
     try {
       e.preventDefault();
 
-      axios.defaults.withCredentials = true;
+      // axios.defaults.withCredentials = true;
 
       if (isSignUp) {
         const { data } = await axios.post(backendUrl + "/auth/register", {
@@ -35,7 +35,7 @@ export default function AuthForm({ className, ...props }) {
 
         if (data.success) {
           toast.success(data.message);
-          navigate("/verify-email", { state: { email } });
+          navigate("/email-verify", { state: { email } });
         } else {
           toast.error(data.message);
         }

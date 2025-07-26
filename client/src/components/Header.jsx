@@ -13,7 +13,7 @@ const Header = () => {
 
   const logout = async () => {
     try {
-      axios.defaults.withCredentials = true;
+      // axios.defaults.withCredentials = true;
       const { data } = await axios.post(backendUrl + "/auth/logout");
       data.success && setIsLoggedIn(false);
       data.success && setUserData(false);

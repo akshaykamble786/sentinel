@@ -1,14 +1,15 @@
 import axios from "axios";
 import { createContext, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export const AppContext = createContext();
 
 export const AppContextProvider = ({ children }) => {
-  axios.defaults.withCredentials = true;
+  // axios.defaults.withCredentials = true;
   
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userData, setUserData] = useState(false);
+  const [userData, setUserData] = useState(null);
 
   const getAuthStatus = async () => {
     try {
@@ -21,7 +22,12 @@ export const AppContextProvider = ({ children }) => {
         setUserData("");
       }
     } catch (error) {
-      toast.error(error.message);
+      if (error.response && error.response.status === 400) {
+        setIsLoggedIn(false);
+        setUserData("");
+      } else {
+        toast.error(error.response?.data?.message || error.message || "An error occurred.");
+      }
     }
   };
 

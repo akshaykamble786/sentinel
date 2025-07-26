@@ -12,15 +12,21 @@ import { AppContext } from "@/context/AppContext";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const EmailVerify = () => {
-  axios.defaults.withCredentials = true;
+  // axios.defaults.withCredentials = true;
   const { backendUrl, isLoggedIn, userData, getUserData, setIsLoggedIn } =
     React.useContext(AppContext);
   const navigate = useNavigate();
   const location = useLocation();
-  const email = location.state?.email;
+  const [email, setEmail] = useState(location.state?.email || localStorage.getItem("verifyEmail") || "");
 
   const [otp, setOtp] = useState("");
   const [isResending, setIsResending] = useState(false);
+
+  useEffect(() => {
+    if (email) {
+      localStorage.setItem("verifyEmail", email);
+    }
+  }, [email]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,6 +49,7 @@ const EmailVerify = () => {
         toast.success("Email verified successfully");
         setIsLoggedIn(true);
         getUserData();
+        localStorage.removeItem("verifyEmail");
         navigate("/dashboard");
       } else {
         toast.error(data.message || "Verification failed");
@@ -79,14 +86,13 @@ const EmailVerify = () => {
   };
 
   useEffect(() => {
-    // If user is already logged in and verified, redirect to dashboard
     if (isLoggedIn && userData && userData.isAccountVerified) {
+      localStorage.removeItem("verifyEmail");
       navigate("/dashboard");
     }
-    // If no email is provided (direct access to verification page), redirect to sign up
-    if (!email) {
-      navigate("/sign-up");
-    }
+    // if (!email) {
+    //   navigate("/sign-up");
+    // }
   }, [isLoggedIn, userData, email, navigate]);
 
   return (

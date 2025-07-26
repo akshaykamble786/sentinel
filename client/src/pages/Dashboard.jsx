@@ -149,7 +149,7 @@ export default function Dashboard() {
 
   const sendVerificationOtp = async () => {
     try {
-      axios.defaults.withCredentials = true;
+      // axios.defaults.withCredentials = true;
       const { data } = await axios.post(backendUrl + '/auth/send-verify-otp');
       if (data.success) {
         navigate('/email-verify');
@@ -183,7 +183,7 @@ export default function Dashboard() {
             </Avatar>
             <span>{userData ? userData.name : "Developer"}</span>
           </div>
-          {!userData.isAccountVerified && <Button onClick={sendVerificationOtp}>Verify Email</Button>}
+          {userData && !userData.isAccountVerified && <Button onClick={sendVerificationOtp}>Verify Email</Button>}
         </div>
 
         {/* Navigation */}

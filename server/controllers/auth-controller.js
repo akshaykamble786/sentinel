@@ -35,12 +35,14 @@ export const register = async (req, res) => {
             from: process.env.SENDER_EMAIL,
             to: email,
             subject: "Welcome to Sentinel - Email Verification Required",
-            html: EMAIL_VERIFY_TEMPLATE.replace("{{otp}}", otp).replace("{{email}}", email)
+            html: EMAIL_VERIFY_TEMPLATE
+                .replace("{{otp}}", otp)
+                .replace("{{email}}", email.replace(/[<>]/g, ''))
         });
 
-        return res.status(200).json({ 
-            success: true, 
-            message: "Registration successful. Please check your email for verification OTP." 
+        return res.status(200).json({
+            success: true,
+            message: "Registration successful. Please check your email for verification OTP."
         });
 
     } catch (error) {
@@ -99,14 +101,13 @@ export const logout = async (req, res) => {
 export const sendVerifyOtp = async (req, res) => {
     try {
         const { email } = req.body;
-        
+
         if (!email) {
             return res.status(400).json({ success: false, message: "Email is required" });
         }
-
         const user = await userModel.findOne({ email });
         if (!user) {
-            return res.status(400).json({ success: false, message: "User not found" });
+            return res.json({ success: true, message: "If the email exists, verification OTP will be sent" });
         }
 
         if (user.isAccountVerified) {
@@ -138,15 +139,13 @@ export const sendVerifyOtp = async (req, res) => {
 
 export const verifyEmail = async (req, res) => {
     const { otp, email } = req.body;
-    
-    if (!otp || !email) {
-        return res.json({ success: false, message: "Missing details" });
-    }
 
+    if (!otp || !email) {
+        return res.status(400).json({ success: false, message: "Missing details" });
+    }
     try {
         const user = await userModel.findOne({ email });
-        if (!user) return res.json({ success: false, message: "User not found" });
-
+        if (!user) return res.status(404).json({ success: false, message: "User not found" });
         if ((user.verifyOtp === "" || user.verifyOtp !== otp))
             return res.json({ success: false, message: "Invalid OTP" });
 
@@ -231,7 +230,7 @@ export const resetPassword = async (req, res) => {
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         user.password = hashedPassword;
         user.resetOtp = "",
-        user.resetOtpExpireAt = 0;
+            user.resetOtpExpireAt = 0;
 
         await user.save();
 
