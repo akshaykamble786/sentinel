@@ -34,9 +34,8 @@ export default function AuthForm({ className, ...props }) {
         });
 
         if (data.success) {
-          setIsLoggedIn(true);
-          getUserData();
-          navigate("/dashboard");
+          toast.success(data.message);
+          navigate("/verify-email", { state: { email } });
         } else {
           toast.error(data.message);
         }

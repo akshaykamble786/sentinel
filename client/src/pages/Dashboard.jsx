@@ -20,6 +20,9 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { AppContext } from "@/context/AppContext";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const loginItems = [
   {
@@ -141,6 +144,24 @@ export default function Dashboard() {
       item.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const { userData, backendUrl } = useContext(AppContext);
+  const navigate = useNavigate();
+
+  const sendVerificationOtp = async () => {
+    try {
+      axios.defaults.withCredentials = true;
+      const { data } = await axios.post(backendUrl + '/auth/send-verify-otp');
+      if (data.success) {
+        navigate('/email-verify');
+        toast.success(data.success);
+      } else {
+        toast.error(data.message || "Failed to send verification OTP");
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }
+
   return (
     <div className="flex h-screen bg-slate-900 text-white">
       {/* Sidebar */}
@@ -152,11 +173,17 @@ export default function Dashboard() {
             <span className="text-xl font-semibold">Sentinel</span>
             <Avatar className="w-8 h-8">
               <AvatarImage
-                src={selectedItem.sharedWith.avatar || "/placeholder.svg"}
+                src={
+                  selectedItem.sharedWith && selectedItem.sharedWith.avatar
+                    ? selectedItem.sharedWith.avatar
+                    : "/placeholder.svg"
+                }
               />
               <AvatarFallback>EG</AvatarFallback>
             </Avatar>
+            <span>{userData ? userData.name : "Developer"}</span>
           </div>
+          {!userData.isAccountVerified && <Button onClick={sendVerificationOtp}>Verify Email</Button>}
         </div>
 
         {/* Navigation */}

@@ -30,7 +30,7 @@ const Header = () => {
         <div className="flex items-center space-x-3">
           <Shield className="h-8 w-8 text-white" />
           <span className="text-2xl font-semibold text-white">
-            Sentinel hi {userData ? userData.name : "Developer"}
+            Sentinel
           </span>
         </div>
         <nav className="hidden md:flex items-center space-x-8">
@@ -54,8 +54,6 @@ const Header = () => {
           </Link>
           {userData ? (
             <div>
-              {userData.name.toUpperCase()}
-              {!userData.isAccountVerified && <Button>Verify Email</Button>}
               <Button onClick={logout}>Logout</Button>
             </div>
           ) : (
