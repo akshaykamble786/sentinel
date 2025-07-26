@@ -14,6 +14,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true,
+    },
+    avatar: {
+        type: String,
+    },
     verifyOtp: {
         type: String,
         default: "",
