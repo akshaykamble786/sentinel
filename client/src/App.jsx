@@ -19,7 +19,6 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/email-verify" element={<EmailVerify />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-
       </Routes>
     </>
   );

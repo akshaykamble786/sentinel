@@ -118,3 +118,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* [data-variant="inset"] [data-sidebar="sidebar"] {
+  @apply rounded-xl;
+}
+
+/* Optional: Add more rounded corners to specific elements */
+/* [data-variant="inset"] .sidebar-header {
+  @apply rounded-t-xl;
+}
+
+[data-variant="inset"] .sidebar-footer {
+  @apply rounded-b-xl;
+} */ 

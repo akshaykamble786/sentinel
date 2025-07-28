@@ -9,7 +9,9 @@ export const getUserData = async (req, res) => {
 
         res.json({success: true, userData : {
             name: user.name,
-            isAccountVerified: user.isAccountVerified
+            isAccountVerified: user.isAccountVerified,
+            avatar: user.avatar,
+            email: user.email
         }})
     } catch (error) {
         return res.status(400).json({success: false, message: error.message});
