@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Sentinel",
+  "version": "1.0",
+  "description": "Open-source password manager extension for Microsoft Edge.",
+  "icons": {},
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {},
+    "default_title": "Sentinel"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["storage", "activeTab"],
+  "host_permissions": ["*://*/*"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["injected_script.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
