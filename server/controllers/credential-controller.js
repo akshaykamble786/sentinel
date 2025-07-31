@@ -3,18 +3,25 @@ import Credential from '../models/credential-model.js';
 
 export const createCredential = async (req, res) => {
     try {
-        const { site, username, password, notes } = req.body;
-        if (!site || !username || !password) {
-            return res.status(400).json({ success: false, message: 'Site, username, and password are required.' });
+        const { site, username, password, notes, name, platform, category } = req.body;
+
+        if (!site || !username || !password || !name || !platform || !category) {     
+            return res.status(400).json({ success: false, message: 'Missing details' });
         }
+
         const encryptedPassword = encrypt(password);
+
         const credential = new Credential({
             userId: req.userId,
             site,
             username,
             password: encryptedPassword,
-            notes
+            notes,
+            name,
+            platform,
+            category
         });
+
         await credential.save();
         res.status(201).json({ success: true, credential: { ...credential.toObject(), password } });
     } catch (err) {
@@ -37,12 +44,17 @@ export const getCredentials = async (req, res) => {
 
 export const editCredential = async (req, res) => {
     try {
-        const { site, username, password, notes } = req.body;
+       const { site, username, password, notes, name, platform, category } = req.body;
         const update = {};
+        
         if (site) update.site = site;
         if (username) update.username = username;
         if (password) update.password = encrypt(password);
         if (notes !== undefined) update.notes = notes;
+        if (name) update.name = name;
+        if (platform) update.platform = platform;
+        if (category) update.category = category;
+
         const credential = await Credential.findOneAndUpdate(
             { _id: req.params.id, userId: req.userId },
             { $set: update },

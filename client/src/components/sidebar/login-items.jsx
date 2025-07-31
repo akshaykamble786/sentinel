@@ -18,3 +18,20 @@ export function LoginItem({ logo, name, email, isActive, onSelect }) {
     </div>
   )
 }
+
+export function CredentialsList({ credentials, selectedId, onSelect }) {
+  return (
+    <div>
+      {credentials.map((cred) => (
+        <LoginItem
+          key={cred._id}
+          logo={"/placeholder.svg"}
+          name={cred.name}
+          email={cred.username}
+          isActive={cred._id === selectedId}
+          onSelect={() => onSelect(cred)}
+        />
+      ))}
+    </div>
+  );
+}

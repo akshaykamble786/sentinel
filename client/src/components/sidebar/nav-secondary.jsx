@@ -12,17 +12,21 @@ import {
 } from "../ui/sheet";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import { useContext } from "react";
+import { AppContext } from "@/context/AppContext";
 
 export function NavSecondary({ items, ...props }) {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const { addCredential } = useContext(AppContext);
+  const [open, setOpen] = React.useState(false);
   const [form, setForm] = React.useState({
     url: "",
     name: "",
-    category: "Social Media",
+    category: "Important",
     email: "",
     password: "",
-    platform: "logins",
+    platform: "Logins",
   });
 
   const handleChange = (e) => {
@@ -30,13 +34,33 @@ export function NavSecondary({ items, ...props }) {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    // TODO: handle save logic
+    const payload = {
+      site: form.url,
+      name: form.name,
+      category: form.category,
+      username: form.email,
+      password: form.password,
+      platform: form.platform,
+      notes: "", 
+    };
+    const success = await addCredential(payload);
+    if (success) {
+      setForm({
+        url: "",
+        name: "",
+        category: "Important",
+        email: "",
+        password: "",
+        platform: "Logins",
+      });
+      setOpen(false);
+    }
   };
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button
           className="w-full bg-primary hover:bg-primary/90 text-primary-foreground justify-center"
@@ -99,7 +123,7 @@ export function NavSecondary({ items, ...props }) {
               required
             >
               <option value="Important">Important</option>
-              <option value="Social Media">Social Media</option>
+              <option value="Social media">Social Media</option>
               <option value="Streaming">Streaming</option>
               <option value="Sports">Sports</option>
             </select>

@@ -11,13 +11,27 @@ const credentialSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  platform: { 
+    type: String, 
+    enum: ["Logins", "Addresses", "Financials"], 
+    required: true 
+  },
+  category: { 
+    type: String, 
+    enum: ["Important", "Social media", "Streaming", "Sports"], 
+    default: "Important"
+  },
+  name: { 
+    type: String, 
+    required: true 
+  },
   username: {
     type: String,
     required: true
   },
   password: {
     type: String,
-    required: true // AES-encrypted
+    required: true
   },
   notes: {
     type: String

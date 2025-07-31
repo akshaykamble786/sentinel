@@ -4,9 +4,9 @@ import { createCredential, deleteCredential, editCredential, getCredentials } fr
 
 const credentialRouter = express.Router();
 
-router.post('/', userAuth, createCredential);
-router.get('/', userAuth, getCredentials);
-router.put('/:id', userAuth, editCredential);
-router.delete('/:id', userAuth, deleteCredential);
+credentialRouter.post('/', userAuth, createCredential);
+credentialRouter.get('/', userAuth, getCredentials);
+credentialRouter.put('/:id', userAuth, editCredential);
+credentialRouter.delete('/:id', userAuth, deleteCredential);
 
 export default credentialRouter;
