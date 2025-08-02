@@ -3,21 +3,33 @@ import { CredentialsList } from "@/components/sidebar/login-items";
 import { PasswordDetails } from "@/components/sidebar/password-details";
 import { ModeToggle } from "@/components/theme/mode-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { AppContext } from "@/context/AppContext";
 import { Search } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function Dashboard() {
   const { credentials, isLoggedIn, userData, editCredential, deleteCredential } = useContext(AppContext);
   const [selectedId, setSelectedId] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,6 +44,32 @@ export default function Dashboard() {
   if (isLoggedIn === false) return null;
 
   const selectedCredential = credentials.find((c) => c._id === selectedId);
+
+  const handleEdit = (credential) => {
+    setEditForm({
+      site: credential.site,
+      name: credential.name,
+      category: credential.category,
+      username: credential.username,
+      password: credential.password,
+      platform: credential.platform,
+      notes: credential.notes || "",
+    });
+    setIsEditing(true);
+  };
+
+  const handleSaveEdit = async () => {
+    const success = await editCredential(selectedCredential._id, editForm);
+    if (success) {
+      setIsEditing(false);
+      setEditForm({});
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditForm({});
+  };
 
   return (
     <SidebarProvider>
@@ -92,7 +130,7 @@ export default function Dashboard() {
 
             <PasswordDetails
               credential={selectedCredential}
-              onEdit={(updates) => editCredential(selectedCredential._id, updates)}
+              onEdit={handleEdit}
               onDelete={async () => {
                 await deleteCredential(selectedCredential._id);
                 setSelectedId(null);
@@ -100,6 +138,95 @@ export default function Dashboard() {
             />
         </div>
       </SidebarInset>
+
+      {/* Edit Credential Dialog */}
+      <Dialog open={isEditing} onOpenChange={setIsEditing}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Credential</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Name
+              </Label>
+              <Input
+                id="name"
+                value={editForm.name || ""}
+                onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="site" className="text-right">
+                Website
+              </Label>
+              <Input
+                id="site"
+                value={editForm.site || ""}
+                onChange={(e) => setEditForm(prev => ({ ...prev, site: e.target.value }))}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="username" className="text-right">
+                Username
+              </Label>
+              <Input
+                id="username"
+                value={editForm.username || ""}
+                onChange={(e) => setEditForm(prev => ({ ...prev, username: e.target.value }))}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="password" className="text-right">
+                Password
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                value={editForm.password || ""}
+                onChange={(e) => setEditForm(prev => ({ ...prev, password: e.target.value }))}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="category" className="text-right">
+                Category
+              </Label>
+              <select
+                id="category"
+                value={editForm.category || "Important"}
+                onChange={(e) => setEditForm(prev => ({ ...prev, category: e.target.value }))}
+                className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="Important">Important</option>
+                <option value="Streaming">Streaming</option>
+                <option value="Social media">Social media</option>
+                <option value="Sports">Sports</option>
+              </select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="notes" className="text-right">
+                Notes
+              </Label>
+              <Textarea
+                id="notes"
+                value={editForm.notes || ""}
+                onChange={(e) => setEditForm(prev => ({ ...prev, notes: e.target.value }))}
+                className="col-span-3"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCancelEdit}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveEdit}>Save changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </SidebarProvider>
   );
 }

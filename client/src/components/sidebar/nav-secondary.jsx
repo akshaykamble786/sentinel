@@ -14,6 +14,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { useContext } from "react";
 import { AppContext } from "@/context/AppContext";
+import { Textarea } from "../ui/textarea";
 
 export function NavSecondary({ items, ...props }) {
   const { state } = useSidebar();
@@ -27,6 +28,7 @@ export function NavSecondary({ items, ...props }) {
     email: "",
     password: "",
     platform: "Logins",
+    notes: "",
   });
 
   const handleChange = (e) => {
@@ -43,7 +45,7 @@ export function NavSecondary({ items, ...props }) {
       username: form.email,
       password: form.password,
       platform: form.platform,
-      notes: "", 
+      notes: form.notes,
     };
     const success = await addCredential(payload);
     if (success) {
@@ -54,6 +56,7 @@ export function NavSecondary({ items, ...props }) {
         email: "",
         password: "",
         platform: "Logins",
+        notes: "",
       });
       setOpen(false);
     }
@@ -70,7 +73,7 @@ export function NavSecondary({ items, ...props }) {
           {!isCollapsed && <span>New Item</span>}
         </Button>
       </SheetTrigger>
-      <SheetContent className="p-2" side="right">
+      <SheetContent className="p-1" side="right">
         <SheetHeader>
           <SheetTitle>Add New Item</SheetTitle>
         </SheetHeader>
@@ -88,6 +91,22 @@ export function NavSecondary({ items, ...props }) {
               <option value="Logins">Logins</option>
               <option value="Financials">Financials</option>
               <option value="Addresses">Addresses</option>
+            </select>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="category">Category</Label>
+            <select
+              id="category"
+              name="category"
+              value={form.category}
+              onChange={handleChange}
+              className="border rounded-md px-3 py-2 bg-background"
+              required
+            >
+              <option value="Important">Important</option>
+              <option value="Social media">Social Media</option>
+              <option value="Streaming">Streaming</option>
+              <option value="Sports">Sports</option>
             </select>
           </div>
           <div className="flex flex-col gap-2">
@@ -112,22 +131,7 @@ export function NavSecondary({ items, ...props }) {
               required
             />
           </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="category">Category</Label>
-            <select
-              id="category"
-              name="category"
-              value={form.category}
-              onChange={handleChange}
-              className="border rounded-md px-3 py-2 bg-background"
-              required
-            >
-              <option value="Important">Important</option>
-              <option value="Social media">Social Media</option>
-              <option value="Streaming">Streaming</option>
-              <option value="Sports">Sports</option>
-            </select>
-          </div>
+
           <div className="flex flex-col gap-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -149,6 +153,16 @@ export function NavSecondary({ items, ...props }) {
               onChange={handleChange}
               placeholder="Password"
               required
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="notes">Notes</Label>
+            <Textarea
+              id="notes"
+              name="notes"
+              value={form.notes || ""}
+              onChange={handleChange}
+              className="border rounded-md px-3 py-2 bg-background"
             />
           </div>
           <SheetFooter className="flex-row justify-end gap-2 pt-4">

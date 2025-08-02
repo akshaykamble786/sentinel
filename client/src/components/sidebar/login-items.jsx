@@ -1,3 +1,5 @@
+import { getCredentialLogo } from "@/lib/utils";
+
 export function LoginItem({ logo, name, email, isActive, onSelect }) {
   return (
     <div
@@ -7,7 +9,14 @@ export function LoginItem({ logo, name, email, isActive, onSelect }) {
       onClick={onSelect}
     >
       <div className="h-10 w-10 rounded-lg overflow-hidden bg-background border border-border flex items-center justify-center">
-        <img src={logo || "/placeholder.svg"} alt={name} className="h-6 w-6 object-contain" />
+        <img 
+          src={logo || "/placeholder.svg"} 
+          alt={name} 
+          className="h-6 w-6 object-contain"
+          onError={(e) => {
+            e.target.src = "/placeholder.svg";
+          }}
+        />
       </div>
       <div className="flex-1 min-w-0">
         <div className="font-medium truncate">{name}</div>
@@ -25,7 +34,7 @@ export function CredentialsList({ credentials, selectedId, onSelect }) {
       {credentials.map((cred) => (
         <LoginItem
           key={cred._id}
-          logo={"/placeholder.svg"}
+          logo={getCredentialLogo(cred)}
           name={cred.name}
           email={cred.username}
           isActive={cred._id === selectedId}

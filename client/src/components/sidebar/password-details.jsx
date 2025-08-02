@@ -1,8 +1,20 @@
-import { Edit, MoreHorizontal, Eye, Copy } from "lucide-react";
+import { Edit, MoreHorizontal, Eye, Copy, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { toast } from "sonner";
+import { getCredentialLogo } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export function PasswordDetails({ credential, onEdit, onDelete }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -30,9 +42,12 @@ export function PasswordDetails({ credential, onEdit, onDelete }) {
         <div className="flex items-center gap-3">
           <div className="h-12 w-12 rounded-lg overflow-hidden bg-background border border-border flex items-center justify-center">
             <img
-              src={credential.logo || "/placeholder.svg"}
+              src={getCredentialLogo(credential)}
               alt={credential.name}
               className="h-8 w-8 object-contain"
+              onError={(e) => {
+                e.target.src = "/placeholder.svg";
+              }}
             />
           </div>
           <div>
@@ -50,25 +65,33 @@ export function PasswordDetails({ credential, onEdit, onDelete }) {
             variant="ghost"
             size="icon"
             className="h-8 w-8"
-            onClick={onEdit}
+            onClick={() => onEdit(credential)}
           >
             <Edit className="h-4 w-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={onDelete}
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-          >
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Trash className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  your credential and remove your data from our servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={onDelete}>
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
 
@@ -115,7 +138,7 @@ export function PasswordDetails({ credential, onEdit, onDelete }) {
                 className="h-6 w-6 hover:bg-accent"
                 onClick={() => {
                   navigator.clipboard.writeText(credential.password);
-                  toast.success('Password copied');
+                  toast.success("Password copied");
                 }}
               >
                 <Copy className="h-3 w-3" />
