@@ -21,16 +21,61 @@ import {
 } from "@/components/ui/dialog";
 import { AppContext } from "@/context/AppContext";
 import { Search } from "lucide-react";
-import { useContext, useEffect, useState } from "react";
+import {
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  useLayoutEffect,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 
 export default function Dashboard() {
-  const { credentials, isLoggedIn, userData, editCredential, deleteCredential } = useContext(AppContext);
+  const {
+    credentials,
+    isLoggedIn,
+    userData,
+    editCredential,
+    deleteCredential,
+    searchCredentials,
+    fetchCredentials,
+  } = useContext(AppContext);
   const [selectedId, setSelectedId] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [shouldRestoreFocus, setShouldRestoreFocus] = useState(false);
+  const searchInputRef = useRef(null);
   const navigate = useNavigate();
+
+  const debouncedSearch = useCallback(
+    (() => {
+      let timeoutId;
+      return (query) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(async () => {
+          if (query.trim() === "") {
+            await fetchCredentials();
+          } else {
+            setIsSearching(true);
+            await searchCredentials(query);
+            setIsSearching(false);
+          }
+          setShouldRestoreFocus(true);
+        }, 300); 
+      };
+    })(),
+    [searchCredentials, fetchCredentials]
+  );
+
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    debouncedSearch(query);
+  };
 
   useEffect(() => {
     if (isLoggedIn === false) {
@@ -40,6 +85,19 @@ export default function Dashboard() {
       setSelectedId(credentials[0]._id);
     }
   }, [isLoggedIn, navigate, credentials, selectedId]);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setSearchQuery("");
+    }
+  }, [isLoggedIn]);
+
+  useLayoutEffect(() => {
+    if (shouldRestoreFocus && searchInputRef.current) {
+      searchInputRef.current.focus();
+      setShouldRestoreFocus(false);
+    }
+  }, [shouldRestoreFocus, credentials]);
 
   if (isLoggedIn === false) return null;
 
@@ -85,9 +143,18 @@ export default function Dashboard() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search..."
+                ref={searchInputRef}
+                placeholder="Search credentials..."
                 className="pl-10 bg-muted/50 border-border"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                disabled={isSearching}
               />
+              {isSearching && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                </div>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-2 ml-auto mr-4">
@@ -128,18 +195,17 @@ export default function Dashboard() {
             </div>
           </div>
 
-            <PasswordDetails
-              credential={selectedCredential}
-              onEdit={handleEdit}
-              onDelete={async () => {
-                await deleteCredential(selectedCredential._id);
-                setSelectedId(null);
-              }}
-            />
+          <PasswordDetails
+            credential={selectedCredential}
+            onEdit={handleEdit}
+            onDelete={async () => {
+              await deleteCredential(selectedCredential._id);
+              setSelectedId(null);
+            }}
+          />
         </div>
       </SidebarInset>
 
-      {/* Edit Credential Dialog */}
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -153,7 +219,9 @@ export default function Dashboard() {
               <Input
                 id="name"
                 value={editForm.name || ""}
-                onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setEditForm((prev) => ({ ...prev, name: e.target.value }))
+                }
                 className="col-span-3"
               />
             </div>
@@ -164,7 +232,9 @@ export default function Dashboard() {
               <Input
                 id="site"
                 value={editForm.site || ""}
-                onChange={(e) => setEditForm(prev => ({ ...prev, site: e.target.value }))}
+                onChange={(e) =>
+                  setEditForm((prev) => ({ ...prev, site: e.target.value }))
+                }
                 className="col-span-3"
               />
             </div>
@@ -175,7 +245,9 @@ export default function Dashboard() {
               <Input
                 id="username"
                 value={editForm.username || ""}
-                onChange={(e) => setEditForm(prev => ({ ...prev, username: e.target.value }))}
+                onChange={(e) =>
+                  setEditForm((prev) => ({ ...prev, username: e.target.value }))
+                }
                 className="col-span-3"
               />
             </div>
@@ -187,7 +259,9 @@ export default function Dashboard() {
                 id="password"
                 type="password"
                 value={editForm.password || ""}
-                onChange={(e) => setEditForm(prev => ({ ...prev, password: e.target.value }))}
+                onChange={(e) =>
+                  setEditForm((prev) => ({ ...prev, password: e.target.value }))
+                }
                 className="col-span-3"
               />
             </div>
@@ -198,7 +272,9 @@ export default function Dashboard() {
               <select
                 id="category"
                 value={editForm.category || "Important"}
-                onChange={(e) => setEditForm(prev => ({ ...prev, category: e.target.value }))}
+                onChange={(e) =>
+                  setEditForm((prev) => ({ ...prev, category: e.target.value }))
+                }
                 className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <option value="Important">Important</option>
@@ -214,7 +290,9 @@ export default function Dashboard() {
               <Textarea
                 id="notes"
                 value={editForm.notes || ""}
-                onChange={(e) => setEditForm(prev => ({ ...prev, notes: e.target.value }))}
+                onChange={(e) =>
+                  setEditForm((prev) => ({ ...prev, notes: e.target.value }))
+                }
                 className="col-span-3"
               />
             </div>

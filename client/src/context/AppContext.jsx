@@ -123,6 +123,27 @@ export const AppContextProvider = ({ children }) => {
     }
   };
 
+  const searchCredentials = async (query) => {
+    try {
+      const { data } = await axios.get(
+        backendUrl + `/credentials/search?query=${encodeURIComponent(query)}`,
+        {
+          withCredentials: true,
+        }
+      );
+      if (data.success) {
+        setCredentials(data.credentials);
+        return true;
+      } else {
+        toast.error(data.message || "Failed to search credentials");
+        return false;
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message || "An error occurred.");
+      return false;
+    }
+  };
+
   useEffect(() => {
     getAuthStatus();
   }, []);
@@ -143,6 +164,7 @@ export const AppContextProvider = ({ children }) => {
     addCredential,
     editCredential,
     deleteCredential,
+    searchCredentials,
   };
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

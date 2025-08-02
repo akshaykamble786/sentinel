@@ -80,3 +80,39 @@ export const deleteCredential = async (req, res) => {
         res.status(500).json({ success: false, message: 'Failed to delete credential.' });
     }
 }
+
+export const searchCredentials = async (req, res) => {
+    try {
+        const { query } = req.query;
+        
+        if (!query || query.trim() === '') {
+            const credentials = await Credential.find({ userId: req.userId }).sort({ updatedAt: -1 });
+            const decrypted = credentials.map(c => ({
+                ...c.toObject(),
+                password: decrypt(c.password)
+            }));
+            return res.json({ success: true, credentials: decrypted });
+        }
+
+        const searchRegex = new RegExp(query, 'i');
+        const credentials = await Credential.find({
+            userId: req.userId,
+            $or: [
+                { site: searchRegex },
+                { name: searchRegex },
+                { username: searchRegex },
+                { notes: searchRegex },
+                { category: searchRegex }
+            ]
+        }).sort({ updatedAt: -1 });
+
+        const decrypted = credentials.map(c => ({
+            ...c.toObject(),
+            password: decrypt(c.password)
+        }));
+        
+        res.json({ success: true, credentials: decrypted });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Failed to search credentials.' });
+    }
+}
