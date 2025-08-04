@@ -19,7 +19,6 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 import { useState } from "react"
-import { Separator } from "../ui/separator"
 
 const categories = [
   {
@@ -39,10 +38,14 @@ const categories = [
     color: "bg-yellow-500",
   },
 ]
-export function NavMain({
-  items,
-}) {
+
+export function NavCategories({ onCategorySelect, selectedFilter }) {
   const [categoriesOpen, setCategoriesOpen] = useState(true)
+  
+  const handleCategoryClick = (categoryTitle) => {
+    onCategorySelect({ type: 'category', value: categoryTitle });
+  };
+
   return (
     <SidebarGroup>
       <Collapsible open={categoriesOpen} onOpenChange={setCategoriesOpen}>
@@ -61,8 +64,18 @@ export function NavMain({
               <SidebarMenu>
                 {categories.map((category) => (
                   <SidebarMenuItem key={category.title}>
-                    <SidebarMenuButton asChild>
-                      <a href="#" className="flex items-center gap-3">
+                    <SidebarMenuButton 
+                      asChild
+                      className={selectedFilter?.type === 'category' && selectedFilter?.value === category.title ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""}
+                    >
+                      <a 
+                        href="#" 
+                        className="flex items-center gap-3"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleCategoryClick(category.title);
+                        }}
+                      >
                         <div className={`size-3 rounded-full ${category.color}`} />
                         <span>{category.title}</span>
                       </a>

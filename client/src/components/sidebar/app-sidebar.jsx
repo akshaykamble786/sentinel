@@ -1,19 +1,8 @@
 import * as React from "react";
-import {
-  BookOpen,
-  Bot,
-  Command,
-  DollarSign,
-  LifeBuoy,
-  Lock,
-  Map,
-  Send,
-  Settings2,
-  SquareTerminal,
-} from "lucide-react";
+import { Command } from "lucide-react";
 
-import { NavMain } from "@/components/sidebar/nav-main";
-import { NavProjects } from "@/components/sidebar/nav-projects";
+import { NavCategories } from "@/components/sidebar/nav-categories";
+import { NavPlatforms } from "@/components/sidebar/nav-platforms";
 import { NavSecondary } from "@/components/sidebar/nav-secondary";
 import { NavUser } from "@/components/sidebar/nav-user";
 import {
@@ -25,132 +14,14 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { Link } from "react-router-dom";
 
-const data = {
-  user: {
-    name: "",
-    email: "",
-    avatar: "",
-  },
-  navMain: [
-    {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: Send,
-    },
-  ],
-  projects: [
-    {
-      name: "Logins",
-      url: "#",
-      icon: Lock,
-    },
-    {
-      name: "Financials",
-      url: "#",
-      icon: DollarSign,
-    },
-    {
-      name: "Addresses",
-      url: "#",
-      icon: Map,
-    },
-  ],
-};
-
-export function AppSidebar({ ...props }) {
+export function AppSidebar({
+  onPlatformSelect,
+  onCategorySelect,
+  selectedFilter,
+  ...props
+}) {
   return (
     <Sidebar collapsible="icon" variant="inset" {...props}>
       <SidebarHeader>
@@ -162,7 +33,11 @@ export function AppSidebar({ ...props }) {
                   <Command className="size-4" />
                 </div>
                 <div className="grid flex-1 ml-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium text-2xl">Sentinel</span>
+                  <Link to="/">
+                    <span className="truncate font-medium text-2xl">
+                      Sentinel
+                    </span>
+                  </Link>
                 </div>
               </a>
             </SidebarMenuButton>
@@ -170,12 +45,18 @@ export function AppSidebar({ ...props }) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavProjects projects={data.projects} />
-        <NavMain items={data.navMain} />
-        <NavSecondary className="mt-auto" />
+        <NavPlatforms
+          onPlatformSelect={onPlatformSelect}
+          selectedFilter={selectedFilter}
+        />
+        <NavCategories
+          onCategorySelect={onCategorySelect}
+          selectedFilter={selectedFilter}
+        />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavSecondary />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   );

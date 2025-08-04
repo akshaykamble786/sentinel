@@ -12,7 +12,6 @@ import { AppContext } from "@/context/AppContext";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const EmailVerify = () => {
-  // axios.defaults.withCredentials = true;
   const { backendUrl, isLoggedIn, userData, getUserData, setIsLoggedIn } =
     React.useContext(AppContext);
   const navigate = useNavigate();

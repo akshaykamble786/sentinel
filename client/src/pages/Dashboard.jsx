@@ -42,14 +42,45 @@ export default function Dashboard() {
     searchCredentials,
     fetchCredentials,
   } = useContext(AppContext);
+
   const [selectedId, setSelectedId] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [shouldRestoreFocus, setShouldRestoreFocus] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState({
+    type: "platform",
+    value: "All",
+  });
+
   const searchInputRef = useRef(null);
   const navigate = useNavigate();
+
+  const filteredCredentials = credentials.filter((credential) => {
+    if (!selectedFilter) return true;
+
+    if (selectedFilter.type === "category") {
+      return credential.category === selectedFilter.value;
+    } else if (selectedFilter.type === "platform") {
+      if (selectedFilter.value === "All") return true;
+      return credential.platform === selectedFilter.value;
+    }
+
+    return true;
+  });
+
+  const handlePlatformSelect = (filter) => {
+    setSelectedFilter(filter);
+    setSearchQuery("");
+    debouncedSearch("");
+  };
+
+  const handleCategorySelect = (filter) => {
+    setSelectedFilter(filter);
+    setSearchQuery("");
+    debouncedSearch("");
+  };
 
   const debouncedSearch = useCallback(
     (() => {
@@ -65,7 +96,7 @@ export default function Dashboard() {
             setIsSearching(false);
           }
           setShouldRestoreFocus(true);
-        }, 300); 
+        }, 300);
       };
     })(),
     [searchCredentials, fetchCredentials]
@@ -74,6 +105,7 @@ export default function Dashboard() {
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
+    setSelectedFilter({ type: "platform", value: "All" });
     debouncedSearch(query);
   };
 
@@ -81,19 +113,20 @@ export default function Dashboard() {
     if (isLoggedIn === false) {
       navigate("/login");
     }
-    if (isLoggedIn && credentials.length > 0 && !selectedId) {
-      setSelectedId(credentials[0]._id);
+    if (isLoggedIn && filteredCredentials.length > 0 && !selectedId) {
+      setSelectedId(filteredCredentials[0]._id);
     }
-  }, [isLoggedIn, navigate, credentials, selectedId]);
+  }, [isLoggedIn, navigate, filteredCredentials, selectedId]);
 
   useEffect(() => {
     if (!isLoggedIn) {
       setSearchQuery("");
+      setSelectedFilter({ type: "platform", value: "All" });
     }
   }, [isLoggedIn]);
 
   useLayoutEffect(() => {
-    if (shouldRestoreFocus && searchInputRef.current) {
+    if (shouldRestoreFocus && credentials.length > 0) {
       searchInputRef.current.focus();
       setShouldRestoreFocus(false);
     }
@@ -101,7 +134,9 @@ export default function Dashboard() {
 
   if (isLoggedIn === false) return null;
 
-  const selectedCredential = credentials.find((c) => c._id === selectedId);
+  const selectedCredential = filteredCredentials.find(
+    (c) => c._id === selectedId
+  );
 
   const handleEdit = (credential) => {
     setEditForm({
@@ -131,7 +166,11 @@ export default function Dashboard() {
 
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar
+        onPlatformSelect={handlePlatformSelect}
+        onCategorySelect={handleCategorySelect}
+        selectedFilter={selectedFilter}
+      />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b">
           <div className="flex items-center gap-2 px-4">
@@ -144,7 +183,7 @@ export default function Dashboard() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 ref={searchInputRef}
-                placeholder="Search credentials..."
+                placeholder={"Search credentials..."}
                 className="pl-10 bg-muted/50 border-border"
                 value={searchQuery}
                 onChange={handleSearchChange}
@@ -188,7 +227,7 @@ export default function Dashboard() {
           <div className="flex-1 p-4 bg-background rounded-3xl overflow-y-auto">
             <div className="space-y-2">
               <CredentialsList
-                credentials={credentials}
+                credentials={filteredCredentials}
                 selectedId={selectedId}
                 onSelect={(cred) => setSelectedId(cred._id)}
               />
@@ -227,7 +266,7 @@ export default function Dashboard() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="site" className="text-right">
-                Website
+                URL
               </Label>
               <Input
                 id="site"
@@ -264,6 +303,23 @@ export default function Dashboard() {
                 }
                 className="col-span-3"
               />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="platform" className="text-right">
+                Platform
+              </Label>
+              <select
+                id="platform"
+                value={editForm.platform || "Logins"}
+                onChange={(e) =>
+                  setEditForm((prev) => ({ ...prev, platform: e.target.value }))
+                }
+                className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="Logins">Logins</option>
+                <option value="Financials">Financials</option>
+                <option value="Addresses">Addresses</option>
+              </select>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="category" className="text-right">
