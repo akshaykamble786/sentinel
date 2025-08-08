@@ -31,6 +31,9 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
+import { CategorySelect } from "@/components/ui/category-select";
+import { CategoryForm } from "@/components/sidebar/category-form";
+import { Plus } from "lucide-react";
 
 export default function Dashboard() {
   const {
@@ -53,6 +56,7 @@ export default function Dashboard() {
     type: "platform",
     value: "All",
   });
+  const [showCategoryForm, setShowCategoryForm] = useState(false);
 
   const searchInputRef = useRef(null);
   const navigate = useNavigate();
@@ -325,19 +329,24 @@ export default function Dashboard() {
               <Label htmlFor="category" className="text-right">
                 Category
               </Label>
-              <select
-                id="category"
-                value={editForm.category || "Important"}
-                onChange={(e) =>
-                  setEditForm((prev) => ({ ...prev, category: e.target.value }))
-                }
-                className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <option value="Important">Important</option>
-                <option value="Streaming">Streaming</option>
-                <option value="Social media">Social media</option>
-                <option value="Sports">Sports</option>
-              </select>
+              <div className="col-span-3 flex gap-2">
+                <CategorySelect
+                  value={editForm.category || ""}
+                  onChange={(value) =>
+                    setEditForm((prev) => ({ ...prev, category: value }))
+                  }
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowCategoryForm(true)}
+                  className="px-3"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="notes" className="text-right">
@@ -349,7 +358,7 @@ export default function Dashboard() {
                 onChange={(e) =>
                   setEditForm((prev) => ({ ...prev, notes: e.target.value }))
                 }
-                className="col-span-3"
+                className="col-span-3 resize-none"
               />
             </div>
           </div>
@@ -361,6 +370,14 @@ export default function Dashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <CategoryForm 
+        open={showCategoryForm} 
+        onOpenChange={setShowCategoryForm}
+        onCategoryCreated={() => {
+          // Refresh categories after creation
+        }}
+      />
     </SidebarProvider>
   );
 }

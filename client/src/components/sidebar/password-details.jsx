@@ -1,7 +1,7 @@
 import { Edit, MoreHorizontal, Eye, Copy, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { toast } from "sonner";
 import { getCredentialLogo } from "@/lib/utils";
 import {
@@ -15,26 +15,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { AppContext } from "@/context/AppContext";
 
 export function PasswordDetails({ credential, onEdit, onDelete }) {
   const [showPassword, setShowPassword] = useState(false);
+  const { categories } = useContext(AppContext);
   if (!credential) return null;
 
-  const getCategoryColor = (category) => {
-    switch (category) {
-      case "Streaming":
-        return "bg-green-600";
-      case "Social media":
-        return "bg-orange-500";
-      case "Sports":
-        return "bg-yellow-500";
-      case "Important":
-      default:
-        return "bg-pink-500";
-    }
-  };
-
-  const categoryColor = getCategoryColor(credential.category);
+  const categoryObj = categories.find(cat => cat.name === credential.category);
+  const categoryColor = categoryObj ? categoryObj.color : "#6366f1";
 
   return (
     <div className="w-102 bg-card border-l border-r rounded-l-2xl rounded-br-2xl p-6 overflow-y-auto">
@@ -54,7 +43,8 @@ export function PasswordDetails({ credential, onEdit, onDelete }) {
             <h2 className="text-lg font-semibold">{credential.name}</h2>
             <Badge
               variant="secondary"
-              className={`${categoryColor} text-white text-xs`}
+              style={{ backgroundColor: categoryColor, color: "#fff" }}
+              className="text-white text-xs"
             >
               {credential.category}
             </Badge>

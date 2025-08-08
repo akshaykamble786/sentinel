@@ -1,5 +1,6 @@
 import { encrypt, decrypt } from '../config/aes-util.js';
 import Credential from '../models/credential-model.js';
+import Category from '../models/category-model.js';
 
 export const createCredential = async (req, res) => {
     try {
@@ -7,6 +8,21 @@ export const createCredential = async (req, res) => {
 
         if (!site || !username || !password || !name || !platform || !category) {     
             return res.status(400).json({ success: false, message: 'Missing details' });
+        }
+
+        let existingCategory = await Category.findOne({ 
+            userId: req.userId, 
+            name: category.trim() 
+        });
+
+        if (!existingCategory) {
+            existingCategory = new Category({
+                userId: req.userId,
+                name: category.trim(),
+                color: '#3B82F6',
+                isDefault: false
+            });
+            await existingCategory.save();
         }
 
         const encryptedPassword = encrypt(password);
@@ -19,12 +35,13 @@ export const createCredential = async (req, res) => {
             notes,
             name,
             platform,
-            category
+            category: existingCategory.name
         });
 
         await credential.save();
         res.status(201).json({ success: true, credential: { ...credential.toObject(), password } });
     } catch (err) {
+        console.error('Error creating credential:', err);
         res.status(500).json({ success: false, message: 'Failed to save credential.' });
     }
 }
@@ -53,7 +70,25 @@ export const editCredential = async (req, res) => {
         if (notes !== undefined) update.notes = notes;
         if (name) update.name = name;
         if (platform) update.platform = platform;
-        if (category) update.category = category;
+        
+        if (category) {
+            let existingCategory = await Category.findOne({ 
+                userId: req.userId, 
+                name: category.trim() 
+            });
+
+            if (!existingCategory) {
+                existingCategory = new Category({
+                    userId: req.userId,
+                    name: category.trim(),
+                    color: '#3B82F6', 
+                    isDefault: false
+                });
+                await existingCategory.save();
+            }
+            
+            update.category = existingCategory.name;
+        }
 
         const credential = await Credential.findOneAndUpdate(
             { _id: req.params.id, userId: req.userId },

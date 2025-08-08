@@ -18,7 +18,6 @@ const credentialSchema = new mongoose.Schema({
   },
   category: { 
     type: String, 
-    enum: ["Important", "Social media", "Streaming", "Sports"], 
     default: "Important"
   },
   name: { 

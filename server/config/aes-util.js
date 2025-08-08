@@ -1,15 +1,14 @@
 import crypto from 'crypto';
 
 const ALGORITHM = 'aes-256-cbc';
-const KEY = Buffer.from(process.env.AES_SECRET_KEY, 'utf8'); // 32 bytes
-const IV_LENGTH = 16; // AES block size
+const KEY = Buffer.from(process.env.AES_SECRET_KEY, 'utf8'); 
+const IV_LENGTH = 16; 
 
 export function encrypt(text) {
   const iv = crypto.randomBytes(IV_LENGTH);
   const cipher = crypto.createCipheriv(ALGORITHM, KEY, iv);
   let encrypted = cipher.update(text, 'utf8', 'base64');
   encrypted += cipher.final('base64');
-  // Store iv with encrypted data (iv:encrypted)
   return iv.toString('base64') + ':' + encrypted;
 }
 

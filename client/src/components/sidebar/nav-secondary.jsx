@@ -12,19 +12,22 @@ import {
 } from "../ui/sheet";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AppContext } from "@/context/AppContext";
 import { Textarea } from "../ui/textarea";
+import { CategorySelect } from "../ui/category-select";
+import { CategoryForm } from "./category-form";
 
 export function NavSecondary({ items, ...props }) {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
-  const { addCredential } = useContext(AppContext);
+  const { addCredential, categories } = useContext(AppContext);
   const [open, setOpen] = React.useState(false);
+  const [showCategoryForm, setShowCategoryForm] = React.useState(false);
   const [form, setForm] = React.useState({
     url: "",
     name: "",
-    category: "Important",
+    category: "",
     email: "",
     password: "",
     platform: "Logins",
@@ -34,6 +37,10 @@ export function NavSecondary({ items, ...props }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCategoryChange = (value) => {
+    setForm((prev) => ({ ...prev, category: value }));
   };
 
   const handleSave = async (e) => {
@@ -52,7 +59,7 @@ export function NavSecondary({ items, ...props }) {
       setForm({
         url: "",
         name: "",
-        category: "Important",
+        category: "",
         email: "",
         password: "",
         platform: "Logins",
@@ -95,19 +102,22 @@ export function NavSecondary({ items, ...props }) {
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="category">Category</Label>
-            <select
-              id="category"
-              name="category"
-              value={form.category}
-              onChange={handleChange}
-              className="border rounded-md px-3 py-2 bg-background"
-              required
-            >
-              <option value="Important">Important</option>
-              <option value="Social media">Social Media</option>
-              <option value="Streaming">Streaming</option>
-              <option value="Sports">Sports</option>
-            </select>
+            <div className="flex gap-2">
+              <CategorySelect
+                value={form.category}
+                onChange={handleCategoryChange}
+                className="border rounded-md px-3 py-2 bg-background flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowCategoryForm(true)}
+                className="px-3"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="url">URL</Label>
@@ -162,7 +172,7 @@ export function NavSecondary({ items, ...props }) {
               name="notes"
               value={form.notes || ""}
               onChange={handleChange}
-              className="border rounded-md px-3 py-2 bg-background"
+              className="border rounded-md px-3 py-2 bg-background resize-none"
             />
           </div>
           <SheetFooter className="flex-row justify-end gap-2 pt-4">
@@ -178,6 +188,14 @@ export function NavSecondary({ items, ...props }) {
           </SheetFooter>
         </form>
       </SheetContent>
+      
+      <CategoryForm 
+        open={showCategoryForm} 
+        onOpenChange={setShowCategoryForm}
+        onCategoryCreated={() => {
+          // Refresh categories after creation
+        }}
+      />
     </Sheet>
   );
 }

@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import transporter from "../config/nodemailer.js";
 import { EMAIL_VERIFY_TEMPLATE, PASSWORD_RESET_TEMPLATE } from "../config/email-template.js";
+import { initializeDefaultCategories } from "./category-controller.js";
 
 export const register = async (req, res) => {
     const { name, email, password } = req.body;
@@ -25,7 +26,8 @@ export const register = async (req, res) => {
         });
         await user.save();
 
-        // Generate and send OTP immediately after registration
+        await initializeDefaultCategories(user._id);
+
         const otp = String(Math.floor(100000 + Math.random() * 900000));
         user.verifyOtp = otp;
         user.verifyOtpExpireAt = Date.now() + 24 * 60 * 60 * 1000;
@@ -203,7 +205,6 @@ export const passwordResetOtp = async (req, res) => {
             from: process.env.SENDER_EMAIL,
             to: user.email,
             subject: "Password reset OTP",
-            // text: `Your OTP for resetting your password is ${otp}. Use this OTP to proceed with resetting your password`,
             html: PASSWORD_RESET_TEMPLATE.replace("{{otp}}", otp).replace("{{email}}", user.email)
         });
 

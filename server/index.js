@@ -9,6 +9,7 @@ import session from 'express-session';
 import passport from 'passport';
 import './config/passport.js';
 import credentialRouter from './routes/credential-routes.js'
+import categoryRouter from './routes/category-routes.js'
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -35,5 +36,6 @@ app.get('/', (req, res)=> res.send("API Working!!!"));
 app.use('/auth', authRouter)
 app.use('/user', userRouter);
 app.use('/credentials', credentialRouter);
+app.use('/categories', categoryRouter);
 
 app.listen(port, () => console.log(`Server running at http://localhost:5000`))

@@ -3,6 +3,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Separator } from "../ui/separator";
 import { DollarSign, Lock, Map, Grid } from "lucide-react";
@@ -30,9 +31,10 @@ export function NavPlatforms({ onPlatformSelect, selectedFilter }) {
   const handlePlatformClick = (platformName) => {
     onPlatformSelect({ type: "platform", value: platformName });
   };
+  const { state } = useSidebar();
 
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+    <SidebarGroup>
       <Separator orientation="horizontal" className="mb-2" />
       <SidebarMenu>
         {platforms.map((item) => (
@@ -52,9 +54,10 @@ export function NavPlatforms({ onPlatformSelect, selectedFilter }) {
                   e.preventDefault();
                   handlePlatformClick(item.name);
                 }}
+                className={state === "collapsed" ? "flex items-center justify-center" : "flex items-center gap-2"}
               >
                 <item.icon />
-                <span>{item.name}</span>
+                {state !== "collapsed" && <span>{item.name}</span>}
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

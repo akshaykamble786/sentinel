@@ -22,8 +22,6 @@ const ResetPassword = () => {
 
   const { backendUrl, isLoggedIn, userData } = useContext(AppContext);
 
-  // axios.defaults.withCredentials = true;
-
   const onSubmitEmail = async (e) => {
     e.preventDefault();
     setIsLoading(true);

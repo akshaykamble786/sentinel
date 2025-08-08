@@ -89,9 +89,6 @@ const EmailVerify = () => {
       localStorage.removeItem("verifyEmail");
       navigate("/dashboard");
     }
-    // if (!email) {
-    //   navigate("/sign-up");
-    // }
   }, [isLoggedIn, userData, email, navigate]);
 
   return (

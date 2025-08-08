@@ -24,8 +24,6 @@ export default function AuthForm({ className, ...props }) {
     try {
       e.preventDefault();
 
-      // axios.defaults.withCredentials = true;
-
       if (isSignUp) {
         const { data } = await axios.post(backendUrl + "/auth/register", {
           name,
