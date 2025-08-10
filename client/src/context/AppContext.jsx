@@ -5,10 +5,10 @@ import { toast } from "sonner";
 export const AppContext = createContext();
 
 const DEFAULT_CATEGORIES = [
-  { name: "Important", color: "#6366f1" },
-  { name: "Social media", color: "#f59e42" },
-  { name: "Streaming", color: "#ef4444" },
-  { name: "Sports", color: "#22c55e" },
+  { name: "Important", color: "#6366f1", isDefault: true },
+  { name: "Social media", color: "#f59e42", isDefault: true },
+  { name: "Streaming", color: "#ef4444", isDefault: true },
+  { name: "Sports", color: "#22c55e", isDefault: true },
 ];
 
 export const AppContextProvider = ({ children }) => {

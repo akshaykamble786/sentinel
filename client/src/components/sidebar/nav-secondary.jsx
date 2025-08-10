@@ -82,7 +82,7 @@ export function NavSecondary({ items, ...props }) {
       </SheetTrigger>
       <SheetContent className="p-1" side="right">
         <SheetHeader>
-          <SheetTitle>Add New Item</SheetTitle>
+          <SheetTitle>Add New Credential</SheetTitle>
         </SheetHeader>
         <form className="flex flex-col gap-4 px-2" onSubmit={handleSave}>
           <div className="flex flex-col gap-2">

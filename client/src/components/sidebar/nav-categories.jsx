@@ -70,7 +70,7 @@ export function NavCategories({ onCategorySelect, selectedFilter }) {
             <SidebarGroupContent>
               <SidebarMenu>
                 {categories.map((category) => (
-                  <SidebarMenuItem key={category._id || category.name} className="group relative">
+                  <SidebarMenuItem key={category._id || category.name} className="group/category relative">
                     <SidebarMenuButton 
                       asChild
                       className={`${selectedFilter?.type === 'category' && selectedFilter?.value === category.name ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""} pr-8`}
@@ -90,16 +90,17 @@ export function NavCategories({ onCategorySelect, selectedFilter }) {
                         {state !== "collapsed" && <span>{category.name}</span>}
                       </a>
                     </SidebarMenuButton>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <SidebarMenuAction
-                          showOnHover
-                          aria-label="Category actions"
-                          className="z-10 opacity-0 md:opacity-0 group-hover:opacity-100 group-hover/menu-item:opacity-100 peer-hover/menu-button:opacity-100 hover:opacity-100"
-                        >
-                          <MoreHorizontal className="w-4 h-4" />
-                        </SidebarMenuAction>
-                      </PopoverTrigger>
+                    {!category.isDefault && (
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <SidebarMenuAction
+                            showOnHover
+                            aria-label="Category actions"
+                            className="z-10 opacity-0 group-hover/category:opacity-100"
+                          >
+                            <MoreHorizontal className="w-4 h-4" />
+                          </SidebarMenuAction>
+                        </PopoverTrigger>
                       <PopoverContent align="end" className="w-44 p-1">
                         <div className="flex flex-col">
                           <Button
@@ -127,6 +128,7 @@ export function NavCategories({ onCategorySelect, selectedFilter }) {
                         </div>
                       </PopoverContent>
                     </Popover>
+                    )}
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>

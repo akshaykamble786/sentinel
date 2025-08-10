@@ -181,9 +181,9 @@ export default function AuthForm({ className, ...props }) {
 
           <div className="bg-muted relative hidden md:block w-full h-full min-h-[350px]">
             <img
-              src="/placeholder.svg"
+              src="/tom.webp"
               alt="Image"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+              className="absolute inset-0 h-full w-full object-cover"
               style={{ minHeight: 350, borderRadius: "0 0.5rem 0.5rem 0" }}
             />
           </div>
