@@ -26,7 +26,7 @@ export function PasswordDetails({ credential, onEdit, onDelete }) {
   const categoryColor = categoryObj ? categoryObj.color : "#6366f1";
 
   return (
-    <div className="w-102 bg-card border-l border-r rounded-l-2xl rounded-br-2xl p-6 overflow-y-auto">
+    <div className="w-102 bg-card rounded-l-2xl rounded-br-2xl p-6 overflow-y-auto">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="h-12 w-12 rounded-lg overflow-hidden bg-background border border-border flex items-center justify-center">

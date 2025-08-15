@@ -15,6 +15,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Link } from "react-router-dom";
+import Logo from "../Logo";
 
 export function AppSidebar({
   onPlatformSelect,
@@ -28,18 +29,9 @@ export function AppSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Command className="size-4" />
-                </div>
-                <div className="grid flex-1 ml-1 text-left text-sm leading-tight">
-                  <Link to="/">
-                    <span className="truncate font-medium text-2xl">
-                      Sentinel
-                    </span>
-                  </Link>
-                </div>
-              </a>
+              <div className="p-3">
+                <Logo />
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
