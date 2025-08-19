@@ -59,7 +59,7 @@ export default function Features() {
   return (
     <section
       id="features"
-      className="w-full py-20 px-6 md:px-12 bg-card relative overflow-hidden"
+      className="w-full py-20 px-6 md:px-12 bg-card relative overflow-hidden border-t"
     >
       <Pill pill="Features" />
       <div className="relative z-20 py-6 lg:py-3 max-w-4xl mx-auto px-8">

@@ -11,7 +11,7 @@ const Faq = () => {
   return (
     <section
       id="faqs"
-      className="w-full py-20 px-6 md:px-12 bg-card relative overflow-hidden"
+      className="w-full py-20 px-6 md:px-12 bg-card relative overflow-hidden border-t"
     >
       <Pill pill="FAQ" />
       {/* Background grid */}

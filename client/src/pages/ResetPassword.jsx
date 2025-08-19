@@ -73,7 +73,7 @@ const ResetPassword = () => {
       {!isEmailSent && (
         <form
           onSubmit={onSubmitEmail}
-          className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md"
+          className="max-w-md mx-auto mt-10 p-6 bg-background rounded-lg shadow-md"
         >
           <h1 className="text-2xl font-bold mb-4">Reset Password</h1>
           <p className="mb-4">Enter your email to reset your password</p>
@@ -87,7 +87,7 @@ const ResetPassword = () => {
           />
           <Button
             type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded-md"
+            className="w-full bg-background text-foreground p-2 rounded-md"
             disabled={isLoading}
           >
             {isLoading ? "Sending..." : "Reset Password"}
@@ -98,7 +98,7 @@ const ResetPassword = () => {
       {isEmailSent && (
         <form
           onSubmit={onSubmitReset}
-          className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md"
+          className="max-w-md mx-auto mt-10 p-6 bg-background rounded-lg shadow-md"
         >
           <h1 className="text-2xl font-bold mb-4">Reset Password</h1>
           <p className="mb-4">Enter the 6-digit OTP sent to your email and your new password</p>
@@ -125,7 +125,7 @@ const ResetPassword = () => {
           />
           <Button
             type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded-md"
+            className="w-full bg-background text-foreground p-2 rounded-md"
             disabled={isLoading}
           >
             {isLoading ? "Submitting..." : "Submit"}

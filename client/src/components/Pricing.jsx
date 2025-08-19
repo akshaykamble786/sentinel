@@ -10,12 +10,11 @@ const Pricing = () => {
       description:
         "Perfect for individuals looking for secure and easy password management.",
       features: [
-        "Store up to 50 passwords",
-        "Basic password generator",
+        "Unlimited password storage",
         "Browser extension support",
-        "Secure autofill",
-        "Standard encryption",
-        "Email support",
+        "AES-256 end-to-end encryption",
+        "Basic password generator",
+        "Two-factor authentication (2FA)",
       ],
       buttonText: "Get Started",
       buttonVariant: "outline",
@@ -27,27 +26,24 @@ const Pricing = () => {
       period: "per month",
       description:
         "Ideal for power users who need advanced security and unlimited storage.",
+      highlightFeature: "Everything in Starter +",
       features: [
-        "Unlimited password storage",
+        "Steganography security",
         "Advanced password generator",
         "Cross-device sync",
-        "AES-256 end-to-end encryption",
-        "Two-factor authentication (2FA)",
         "Security health reports",
         "Priority email & chat support",
       ],
-      buttonText: "Start 14-day trial",
+      buttonText: "Subscribe",
       buttonVariant: "default",
       popular: true,
     },
   ];
 
-
-
   return (
     <section
       id="pricing"
-      className="w-full py-20 px-6 md:px-12 bg-background relative overflow-hidden"
+      className="w-full py-20 px-6 md:px-12 bg-background relative overflow-hidden border-t"
     >
       <Pill pill="Pricing" />
       <div className="max-w-7xl mx-auto space-y-16">
@@ -92,10 +88,10 @@ const Pricing = () => {
                     </div>
                   )}
                 </div>
+                <p className="text-muted-foreground mb-3">{plan.description}</p>
+                <span className="text-sm">{plan.highlightFeature}</span>
 
-                <p className="text-muted-foreground mb-6">{plan.description}</p>
-
-                <div className="space-y-3 mb-8">
+                <div className="space-y-3 mb-8 mt-2">
                   {plan.features.map((feature, i) => (
                     <div key={i} className="flex items-center gap-3">
                       <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center text-primary">

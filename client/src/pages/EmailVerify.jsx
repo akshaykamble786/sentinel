@@ -94,7 +94,7 @@ const EmailVerify = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md"
+      className="max-w-md mx-auto mt-10 p-6 bg-background rounded-lg shadow-md"
     >
       <h1 className="text-2xl font-bold mb-4">Email Verification</h1>
       <p className="mb-4">Enter the 6-digit code sent to {email}</p>

@@ -1,10 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader } from "lucide-react";
-import Pill from "@/components/ui/pill"
+import Pill from "@/components/ui/pill";
+import { AppContext } from "@/context/AppContext";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const { userData } = useContext(AppContext);
+  const navigate = useNavigate();
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true);
@@ -27,7 +32,7 @@ const HeroSection = () => {
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         }`}
       >
-        <Pill pill="Secure, transparent password management"/>
+        <Pill pill="Secure, transparent password management" />
 
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-medium tracking-tighter text-balance text-foreground">
           Forget your credentials —
@@ -35,24 +40,34 @@ const HeroSection = () => {
         </h1>
 
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto text-balance">
-        Secure your digital life with our all-in-one password management platform. Built for individuals and teams who value privacy, convenience, and airtight protection
+          Secure your credentials with our all-in-one password management
+          platform. Built for individuals and teams who value privacy,
+          convenience, and airtight protection
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6 items-center">
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground text-base h-12 px-8 transition-all duration-200 min-h-[48px]">
-            Start for free
-          </Button>
-          <Button
-            variant="outline"
-            className="border-border text-foreground hover:bg-accent hover:text-accent-foreground text-base h-12 px-8 transition-all duration-200 min-h-[48px]"
-          >
-            Book a demo
-          </Button>
-        </div>
-      </div>  
+        {userData ? (
+          <Button className="p-5 text-sm" onClick={() => navigate('/dashboard')}>Go To Dashboard </Button>
+        ) : (
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6 items-center">
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground text-base h-12 px-8 transition-all duration-200 min-h-[48px]">
+              Start for free
+            </Button>
+            <Button
+              variant="outline"
+              className="border-border text-foreground hover:bg-accent hover:text-accent-foreground text-base h-12 px-8 transition-all duration-200 min-h-[48px]"
+            >
+              Book a demo
+            </Button>
+          </div>
+        )}
+      </div>
 
-      <div className={`w-full max-w-7xl mt-12 z-10 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}>
-        <img src="/dashboard.png" className="rounded-lg"/>
+      <div
+        className={`w-full max-w-7xl mt-12 z-10 transition-all duration-1000 delay-500 ${
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
+        }`}
+      >
+        <img src="/dashboard.png" className="rounded-lg" />
       </div>
     </section>
   );
