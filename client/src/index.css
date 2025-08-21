@@ -160,3 +160,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+.extension-popup body {
+  min-width: 380px;
+  min-height: 560px;
+}

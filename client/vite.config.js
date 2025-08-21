@@ -4,7 +4,8 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+  base: mode === 'extension' ? './' : '/',
   plugins: [
     react(),
     tailwindcss()
@@ -14,5 +15,9 @@ export default defineConfig({
       "@" :  path.resolve(__dirname, "./src"),
       pages: path.resolve(__dirname, 'pages')
     }
+  },
+  build: {
+    outDir: mode === 'extension' ? path.resolve(__dirname, '../extension') : undefined,
+    emptyOutDir: mode === 'extension' ? false : undefined
   }
-})
+}))

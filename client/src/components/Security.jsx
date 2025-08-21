@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
 import React from "react";
 import { BentoGrid, BentoGridItem } from "./ui/bento-grid";
-import { motion } from "motion/react"
- import {
+import { motion } from "motion/react";
+import {
   Database,
   EyeOff,
   GlobeLock,
@@ -12,7 +12,13 @@ import { motion } from "motion/react"
   ShieldCheckIcon,
 } from "lucide-react";
 import Pill from "./ui/pill";
-import { BrowserSecurity, EndToEndEncryption, LocalFirstEncryption, PasswordHashing, ZeroKnowledgeArchitecture} from "./ui/visual-wrapper";
+import {
+  BrowserSecurity,
+  EndToEndEncryption,
+  LocalFirstEncryption,
+  PasswordHashing,
+  ZeroKnowledgeArchitecture,
+} from "./ui/visual-wrapper";
 
 export default function Security() {
   return (
@@ -31,14 +37,17 @@ export default function Security() {
             authentication keep your data safe at all times
           </p>
         </div>
-        <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[20rem] rounded-xl">
+        <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[24rem] rounded-xl">
           {items.map((item, i) => (
             <BentoGridItem
               key={i}
               title={item.title}
               description={item.description}
               header={item.header}
-              className={cn("[&>p:text-lg]", item.className)}
+              className={cn(
+                "[&>p:text-lg] [&>div:first-child]:h-[65%]",
+                item.className
+              )}
               icon={item.icon}
             />
           ))}

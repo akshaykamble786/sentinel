@@ -19,6 +19,18 @@ export const AppContextProvider = ({ children }) => {
   const [credentials, setCredentials] = useState([]);
   const [categories, setCategories] = useState([]);
 
+  const isExtensionEnv = (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.id) || import.meta.env.MODE === "extension";
+
+  const syncCredentialsToExtension = (creds) => {
+    try {
+      if (!isExtensionEnv) return;
+      const payload = Array.isArray(creds) ? creds : credentials;
+      if (!Array.isArray(payload)) return;
+      chrome.runtime.sendMessage({ type: 'SYNC_CREDENTIALS', credentials: payload });
+    } catch (_) {
+    }
+  };
+
   const getAuthStatus = async () => {
     try {
       const { data } = await axios.get(backendUrl + "/auth/is-auth");
@@ -55,6 +67,7 @@ export const AppContextProvider = ({ children }) => {
       const { data } = await axios.get(backendUrl + "/credentials", { withCredentials: true });
       if (data.success) {
         setCredentials(data.credentials);
+        syncCredentialsToExtension(data.credentials);
       } else {
         toast.error(data.message || "Failed to fetch credentials");
       }
@@ -75,6 +88,7 @@ export const AppContextProvider = ({ children }) => {
       if (data.success) {
         setCredentials((prev) => [data.credential, ...prev]);
         toast.success("Credential saved");
+        syncCredentialsToExtension([data.credential, ...credentials]);
         return true;
       } else {
         toast.error(data.message || "Failed to save credential");
@@ -98,6 +112,8 @@ export const AppContextProvider = ({ children }) => {
       if (data.success) {
         setCredentials((prev) => prev.map(c => c._id === id ? data.credential : c));
         toast.success("Credential updated");
+        const next = credentials.map(c => c._id === id ? data.credential : c);
+        syncCredentialsToExtension(next);
         return true;
       } else {
         toast.error(data.message || "Failed to update credential");
@@ -120,6 +136,8 @@ export const AppContextProvider = ({ children }) => {
       if (data.success) {
         setCredentials((prev) => prev.filter(c => c._id !== id));
         toast.success("Credential deleted");
+        const next = credentials.filter(c => c._id !== id);
+        syncCredentialsToExtension(next);
         return true;
       } else {
         toast.error(data.message || "Failed to delete credential");
