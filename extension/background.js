@@ -2,8 +2,30 @@ chrome.runtime.onInstalled.addListener(() => {
     console.log("Sentinel extension installed")
 })
 
+function getDomainName(url) {
+    try {
+        const urlObj = new URL(url)
+        let hostname = urlObj.hostname.replace(/^www\./, '')
+        // Convert to title case and remove common TLDs for better display
+        const parts = hostname.split('.')
+        if (parts.length >= 2) {
+            const domain = parts[parts.length - 2]
+            return domain.charAt(0).toUpperCase() + domain.slice(1)
+        }
+        return hostname
+    } catch (_) {
+        return url
+    }
+}
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (!message || !message.type) return
+
+    // Handle SYNC_CREDENTIALS_REQUEST (sent from content script after saving)
+    if (message.type === 'SYNC_CREDENTIALS_REQUEST') {
+        // This is just a notification, no response needed
+        return
+    }
 
     if (message.type === 'GET_CREDENTIALS_FOR_ORIGIN') {
         const origin = message.origin
@@ -34,6 +56,44 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const credentials = Array.isArray(message.credentials) ? message.credentials : []
         chrome.storage.local.set({ sentinel_credentials: credentials }, () => {
             sendResponse({ ok: true })
+        })
+        return true
+    }
+
+    if (message.type === 'SAVE_CREDENTIAL') {
+        const cred = message.credential || {}
+        if (!cred || !cred.site) {
+            sendResponse({ ok: false, error: 'invalid_credential' })
+            return true
+        }
+        chrome.storage.local.get(['sentinel_backend_url', 'sentinel_default_category'], async (result) => {
+            const backendUrl = result.sentinel_backend_url || 'http://localhost:5000'
+            const category = result.sentinel_default_category || 'Important'
+            const payload = {
+                site: cred.site,
+                username: cred.username || '',
+                password: cred.password || '',
+                name: cred.name || getDomainName(cred.site),
+                platform: 'Logins',
+                category,
+                notes: cred.notes || ''
+            }
+            try {
+                const res = await fetch(backendUrl + '/credentials', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                    credentials: 'include'
+                })
+                const data = await res.json().catch(() => ({}))
+                if (res.ok && data && data.success) {
+                    sendResponse({ ok: true, saved: true })
+                } else {
+                    sendResponse({ ok: false, error: data?.message || 'save_failed' })
+                }
+            } catch (e) {
+                sendResponse({ ok: false, error: 'network_error' })
+            }
         })
         return true
     }

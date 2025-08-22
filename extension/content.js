@@ -45,6 +45,28 @@
     })
   }
 
+  function requestSyncCredentials() {
+    try {
+      chrome.runtime.sendMessage({ type: 'SYNC_CREDENTIALS' })
+    } catch (_) {}
+  }
+
+  async function saveCredential(credential) {
+    return new Promise((resolve) => {
+      try {
+        chrome.runtime.sendMessage(
+          { type: 'SAVE_CREDENTIAL', credential },
+          (response) => {
+            if (response && response.ok) resolve(true)
+            else resolve(false)
+          }
+        )
+      } catch (_) {
+        resolve(false)
+      }
+    })
+  }
+
   function getFieldRole(input) {
     const name = `${input.name || ''}`.toLowerCase()
     const id = `${input.id || ''}`.toLowerCase()
@@ -208,6 +230,39 @@
       maybeAttachFill(input)
     }
     document.addEventListener('focusin', handler)
+
+    const onSubmit = async (event) => {
+      const form = event.target
+      if (!(form instanceof HTMLFormElement)) return
+      try {
+        const creds = await requestCredentialsForOrigin()
+        const hasAnyForOrigin = Array.isArray(creds) && creds.length > 0
+        const passwordInput = form.querySelector('input[type="password"]')
+        if (!passwordInput) return
+        const usernameInput = form.querySelector('input[type="email"], input[type="text"], input:not([type])')
+        const usernameField = usernameInput && getFieldRole(usernameInput) === 'username' ? usernameInput : findUsernameFieldNear(passwordInput)
+        const username = usernameField ? usernameField.value : ''
+        const password = passwordInput ? passwordInput.value : ''
+        const site = location.origin
+
+        if (!hasAnyForOrigin && (username || password)) {
+          const wantsSave = confirm('Save these credentials to Sentinel?')
+          if (wantsSave) {
+            try {
+              const ok = await saveCredential({ site, username, password })
+              if (ok && ok.saved) {
+                requestSyncCredentials()
+              } else if (ok && ok.error) {
+                console.warn('Failed to save credential:', ok.error)
+              }
+            } catch (e) {
+              console.warn('Error saving credential:', e)
+            }
+          }
+        }
+      } catch (_) { }
+    }
+    document.addEventListener('submit', onSubmit, true)
   }
 
   if (document.readyState === 'loading') {

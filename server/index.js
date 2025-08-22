@@ -18,7 +18,17 @@ connectDB();
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    try {
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      if (origin.startsWith('chrome-extension://')) return callback(null, true);
+    } catch (_) {}
+    return callback(new Error('Not allowed by CORS'))
+  },
+  credentials: true
+}));
 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-session-secret',
