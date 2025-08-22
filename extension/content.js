@@ -1,4 +1,4 @@
-;(function () {
+; (function () {
   const BUTTON_ID = '__sentinel_fill_btn__'
 
   function createFillButton(label) {
@@ -100,8 +100,41 @@
         input.value = value
         input.dispatchEvent(new Event('input', { bubbles: true }))
         input.dispatchEvent(new Event('change', { bubbles: true }))
-      } catch (_) {}
+      } catch (_) { }
     }
+  }
+
+  function createFillButton(label, useIcon) {
+    const btn = document.createElement('button')
+    btn.id = BUTTON_ID
+    btn.type = 'button'
+    btn.style.position = 'absolute'
+    btn.style.zIndex = '2147483647'
+    btn.style.padding = useIcon ? '0' : '6px 10px'
+    btn.style.fontSize = '12px'
+    btn.style.borderRadius = '6px'
+    btn.style.background = '#111827'
+    btn.style.color = '#fff'
+    btn.style.cursor = 'pointer'
+    if (useIcon) {
+      btn.style.background = 'transparent'
+      btn.style.border = 'none'
+      btn.style.boxShadow = 'none'
+      btn.style.borderRadius = '0'
+      btn.style.color = 'inherit'
+      btn.style.lineHeight = '0'
+
+      const img = document.createElement('img')
+      img.src = (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL) ? chrome.runtime.getURL('logo.png') : 'logo.png'
+      img.alt = label || 'Fill from Sentinel'
+      img.style.width = '26px'
+      img.style.height = '26px'
+      img.style.display = 'block'
+      btn.appendChild(img)
+    } else {
+      btn.textContent = label || 'Fill from Sentinel'
+    }
+    return btn
   }
 
   async function maybeAttachFill(targetInput) {
@@ -111,7 +144,7 @@
     const creds = await requestCredentialsForOrigin()
     if (!creds || creds.length === 0) return
 
-    const btn = createFillButton(creds.length === 1 ? 'Fill credentials' : `Choose (${creds.length})`)
+    const btn = createFillButton(creds.length === 1 ? '' : `Choose (${creds.length})`, creds.length === 1)
     document.body.appendChild(btn)
     positionButton(btn, targetInput)
 
@@ -122,7 +155,7 @@
       window.removeEventListener('scroll', onScroll, { passive: true })
       window.removeEventListener('resize', onResize)
       document.removeEventListener('focusin', onFocusIn)
-      try { btn.remove() } catch (_) {}
+      try { btn.remove() } catch (_) { }
     }
 
     const onScroll = () => positionButton(btn, targetInput)
@@ -161,7 +194,7 @@
           passwordInput.focus()
           setInputValue(passwordInput, selected.password || '')
         }
-      } catch (_) {}
+      } catch (_) { }
       removeButton()
     })
   }
