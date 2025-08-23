@@ -67,7 +67,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             return true
         }
         chrome.storage.local.get(['sentinel_backend_url', 'sentinel_default_category'], async (result) => {
-            const backendUrl = result.sentinel_backend_url || 'http://localhost:5000'
+            const backendUrl = result.sentinel_backend_url || 'https://sentinel-server.vercel.app'
             const category = result.sentinel_default_category || 'Important'
             const payload = {
                 site: cred.site,
