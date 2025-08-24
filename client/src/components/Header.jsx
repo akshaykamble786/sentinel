@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { Button } from "@/components/ui/button";
 import Logo from "./Logo";
 import { Menu, X, CircleDot, LayoutDashboard, DollarSign } from "lucide-react";
@@ -15,7 +15,7 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navigate = useNavigate();
-  const { userData, backendUrl, setUserData, setIsLoggedIn } =
+  const { userData, backendUrl, setUserData, setIsLoggedIn, isAuthenticating } =
     useContext(AppContext);
 
   const logout = async () => {
@@ -168,11 +168,11 @@ const Header = () => {
               </div>
 
               <div className="rounded-2xl">
-                {userData ? (
+                {!isAuthenticating && userData ? (
                   <div>
                     <Button onClick={logout}>Log out</Button>
                   </div>
-                ) : (
+                ) : !isAuthenticating ? (
                   <>
                     <Link
                       to="/login"
@@ -198,7 +198,7 @@ const Header = () => {
                       </Button>
                     </Link>
                   </>
-                )}
+                ) : null}
               </div>
             </div>
           </div>
@@ -207,11 +207,11 @@ const Header = () => {
         <div className="hidden md:flex items-center gap-4">
           <ModeToggle />
           <div className="rounded-2xl">
-            {userData ? (
+            {!isAuthenticating && userData ? (
               <div>
                 <Button onClick={logout}>Log out</Button>
               </div>
-            ) : (
+            ) : !isAuthenticating ? (
               <>
                 <Link
                   to="/login"
@@ -237,7 +237,7 @@ const Header = () => {
                   </Button>
                 </Link>
               </>
-            )}
+            ) : null}
           </div>
         </div>
       </header>

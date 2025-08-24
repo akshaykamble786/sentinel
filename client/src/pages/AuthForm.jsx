@@ -18,7 +18,7 @@ export default function AuthForm({ className, ...props }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { backendUrl, isLoggedIn, setIsLoggedIn, getUserData, userData } = useContext(AppContext);
+  const { backendUrl, isLoggedIn, setIsLoggedIn, getUserData, userData, isAuthenticating } = useContext(AppContext);
 
   const handleSubmit = async (e) => {
     try {
@@ -57,10 +57,14 @@ export default function AuthForm({ className, ...props }) {
   };
 
   useEffect(() => {
-    if (isLoggedIn && userData && userData.isAccountVerified) {
+    if (!isAuthenticating && isLoggedIn && userData && userData.isAccountVerified) {
       navigate("/dashboard")
     }
-  }, [isLoggedIn, userData])
+  }, [isAuthenticating, isLoggedIn, userData, navigate])
+
+  if (isAuthenticating) {
+    return null;
+  }
   
   return (
     <div

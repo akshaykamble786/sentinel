@@ -32,7 +32,7 @@ import { toast } from "sonner";
 export function NavUser({ user }) {
   const { isMobile } = useSidebar();
   const navigate = useNavigate();
-  const { userData, backendUrl, setIsLoggedIn, setUserData } = useContext(AppContext);
+  const { userData, backendUrl, setIsLoggedIn, setUserData, isAuthenticating } = useContext(AppContext);
 
   const logout = async () => {
     try {
@@ -45,6 +45,10 @@ export function NavUser({ user }) {
       toast.error(error.message);
     }
   };
+
+  if (isAuthenticating || !userData) {
+    return null;
+  }
 
   return (
     <SidebarMenu>

@@ -5,6 +5,7 @@ import { AppContextProvider } from "./context/AppContext";
 import { BrowserRouter, HashRouter } from "react-router-dom";
 import axios from "axios";
 import { ThemeProvider } from "./components/theme/theme-provider";
+
 axios.defaults.withCredentials = true;
 
 const isExtensionEnv = (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.id) || import.meta.env.MODE === "extension";
@@ -17,12 +18,18 @@ if (isExtensionEnv) {
   } catch (_) {}
 }
 
+function AppWrapper() {
+  return (
+    <AppContextProvider>
+      <App />
+    </AppContextProvider>
+  );
+}
+
 createRoot(document.getElementById("root")).render(
   <Router>
-    <AppContextProvider>
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <App />
-      </ThemeProvider>
-    </AppContextProvider>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <AppWrapper />
+    </ThemeProvider>
   </Router>
 );

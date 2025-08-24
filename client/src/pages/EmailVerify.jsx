@@ -12,7 +12,7 @@ import { AppContext } from "@/context/AppContext";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const EmailVerify = () => {
-  const { backendUrl, isLoggedIn, userData, getUserData, setIsLoggedIn } =
+  const { backendUrl, isLoggedIn, userData, getUserData, setIsLoggedIn, isAuthenticating } =
     React.useContext(AppContext);
   const navigate = useNavigate();
   const location = useLocation();
@@ -85,11 +85,14 @@ const EmailVerify = () => {
   };
 
   useEffect(() => {
-    if (isLoggedIn && userData && userData.isAccountVerified) {
-      localStorage.removeItem("verifyEmail");
-      navigate("/dashboard");
+    if (!isAuthenticating && isLoggedIn && userData && userData.isAccountVerified) {
+      navigate("/dashboard")
     }
-  }, [isLoggedIn, userData, email, navigate]);
+  }, [isAuthenticating, isLoggedIn, userData, navigate])
+
+  if (isAuthenticating) {
+    return null;
+  }
 
   return (
     <form

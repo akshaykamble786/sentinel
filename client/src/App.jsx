@@ -5,9 +5,17 @@ import AuthForm from "./pages/AuthForm";
 import { Toaster } from "./components/ui/sonner";
 import EmailVerify from "./pages/EmailVerify";
 import ResetPassword from "./pages/ResetPassword";
+import { AuthLoading } from "./components/ui/auth-loading";
+import { useContext } from "react";
+import { AppContext } from "./context/AppContext";
 
 function App() {
+  const { isAuthenticating } = useContext(AppContext);
   const isExtensionEnv = (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.id) || import.meta.env.MODE === "extension";
+
+  if (isAuthenticating) {
+    return <AuthLoading />;
+  }
 
   return (
     <>

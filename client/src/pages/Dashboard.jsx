@@ -44,6 +44,7 @@ export default function Dashboard() {
     deleteCredential,
     searchCredentials,
     fetchCredentials,
+    isAuthenticating,
   } = useContext(AppContext);
 
   const [selectedId, setSelectedId] = useState(null);
@@ -114,13 +115,13 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    if (isLoggedIn === false) {
+    if (!isAuthenticating && isLoggedIn === false) {
       navigate("/login");
     }
     if (isLoggedIn && filteredCredentials.length > 0 && !selectedId) {
       setSelectedId(filteredCredentials[0]._id);
     }
-  }, [isLoggedIn, navigate, filteredCredentials, selectedId]);
+  }, [isAuthenticating, isLoggedIn, navigate, filteredCredentials, selectedId]);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -135,6 +136,10 @@ export default function Dashboard() {
       setShouldRestoreFocus(false);
     }
   }, [shouldRestoreFocus, credentials]);
+
+  if (isAuthenticating) {
+    return null;
+  }
 
   if (isLoggedIn === false) return null;
 

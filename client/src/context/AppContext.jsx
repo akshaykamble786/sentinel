@@ -18,6 +18,7 @@ export const AppContextProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [credentials, setCredentials] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [isAuthenticating, setIsAuthenticating] = useState(true);
 
   const isExtensionEnv = (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.id) || import.meta.env.MODE === "extension";
 
@@ -33,6 +34,7 @@ export const AppContextProvider = ({ children }) => {
 
   const getAuthStatus = async () => {
     try {
+      setIsAuthenticating(true);
       const { data } = await axios.get(backendUrl + "/auth/is-auth");
       if (data.success) {
         setIsLoggedIn(true);
@@ -48,6 +50,8 @@ export const AppContextProvider = ({ children }) => {
       } else {
         toast.error(error.response?.data?.message || error.message || "An error occurred.");
       }
+    } finally {
+      setIsAuthenticating(false);
     }
   };
 
@@ -286,6 +290,7 @@ export const AppContextProvider = ({ children }) => {
     createCategory,
     updateCategory,
     deleteCategory,
+    isAuthenticating,
   };
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

@@ -6,7 +6,6 @@ function getDomainName(url) {
     try {
         const urlObj = new URL(url)
         let hostname = urlObj.hostname.replace(/^www\./, '')
-        // Convert to title case and remove common TLDs for better display
         const parts = hostname.split('.')
         if (parts.length >= 2) {
             const domain = parts[parts.length - 2]
@@ -21,9 +20,7 @@ function getDomainName(url) {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (!message || !message.type) return
 
-    // Handle SYNC_CREDENTIALS_REQUEST (sent from content script after saving)
     if (message.type === 'SYNC_CREDENTIALS_REQUEST') {
-        // This is just a notification, no response needed
         return
     }
 

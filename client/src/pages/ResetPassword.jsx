@@ -20,7 +20,7 @@ const ResetPassword = () => {
   const [isEmailSent, setIsEmailSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { backendUrl, isLoggedIn, userData } = useContext(AppContext);
+  const { backendUrl, isLoggedIn, userData, isAuthenticating } = useContext(AppContext);
 
   const onSubmitEmail = async (e) => {
     e.preventDefault();
@@ -63,10 +63,14 @@ const ResetPassword = () => {
   };
 
   useEffect(() => {
-    if (isLoggedIn && userData && userData.isAccountVerified) {
+    if (!isAuthenticating && isLoggedIn && userData && userData.isAccountVerified) {
       navigate("/dashboard")
     }
-  }, [isLoggedIn, userData])
+  }, [isAuthenticating, isLoggedIn, userData, navigate])
+
+  if (isAuthenticating) {
+    return null;
+  }
 
   return (
     <div>

@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const { userData } = useContext(AppContext);
+  const { userData, isAuthenticating } = useContext(AppContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,9 +45,9 @@ const HeroSection = () => {
           convenience, and airtight protection
         </p>
 
-        {userData ? (
+        {!isAuthenticating && userData ? (
           <Button className="p-5 text-sm" onClick={() => navigate('/dashboard')}>Go To Dashboard </Button>
-        ) : (
+        ) : !isAuthenticating ? (
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6 items-center">
             <Button className="bg-primary text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground text-base h-12 px-8 transition-all duration-200 min-h-[48px]">
               Start for free
@@ -59,7 +59,7 @@ const HeroSection = () => {
               Book a demo
             </Button>
           </div>
-        )}
+        ) : null}
       </div>
 
       <div
