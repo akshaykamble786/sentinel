@@ -13,7 +13,7 @@ const credentialSchema = new mongoose.Schema({
   },
   platform: { 
     type: String, 
-    enum: ["Logins", "Addresses", "Financials"], 
+    enum: ["Logins", "Addresses", "Identity"], 
     required: true 
   },
   category: { 
@@ -34,6 +34,10 @@ const credentialSchema = new mongoose.Schema({
   },
   notes: {
     type: String
+  },
+  lastAutofill: {
+    type: Date,
+    default: null
   }
 }, { timestamps: true });
 

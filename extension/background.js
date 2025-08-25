@@ -75,14 +75,23 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 category,
                 notes: cred.notes || ''
             }
-            try {
-                const res = await fetch(backendUrl + '/credentials', {
+            const tryPost = async (base) => {
+                const res = await fetch(base + '/credentials', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload),
                     credentials: 'include'
                 })
                 const data = await res.json().catch(() => ({}))
+                return { res, data }
+            }
+            try {
+                let base = backendUrl
+                let { res, data } = await tryPost(base)
+                if (!(res.ok && data && data.success) && !base.includes('localhost')) {
+                    base = 'http://localhost:5000'
+                    ;({ res, data } = await tryPost(base))
+                }
                 if (res.ok && data && data.success) {
                     sendResponse({ ok: true, saved: true })
                 } else {
@@ -91,6 +100,50 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             } catch (e) {
                 sendResponse({ ok: false, error: 'network_error' })
             }
+        })
+        return true
+    }
+
+    if (message.type === 'RECORD_AUTOFILL') {
+        const cred = message.credential || {}
+        const site = cred.site
+        const username = cred.username || ''
+
+        chrome.storage.local.get(['sentinel_backend_url', 'sentinel_credentials'], async (result) => {
+            const backendUrl = result.sentinel_backend_url || 'https://sentinel-server.vercel.app'
+            const allCredentials = Array.isArray(result.sentinel_credentials) ? result.sentinel_credentials : []
+
+            const nowIso = new Date().toISOString()
+            const updatedLocal = allCredentials.map((c) => {
+                try {
+                    const cHost = new URL(c.site).hostname.replace(/^www\./, '')
+                    const sHost = new URL(site).hostname.replace(/^www\./, '')
+                    const hostMatches = cHost === sHost || cHost.endsWith('.' + sHost) || sHost.endsWith('.' + cHost)
+                    const userMatches = !username || c.username === username
+                    if (hostMatches && userMatches) {
+                        return { ...c, lastAutofill: nowIso }
+                    }
+                } catch (_) {}
+                return c
+            })
+            chrome.storage.local.set({ sentinel_credentials: updatedLocal }, () => {})
+
+            const tryRecord = async (base) => fetch(base + '/credentials/record-autofill', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ site, username }),
+                credentials: 'include'
+            })
+            try {
+                let base = backendUrl
+                let res = await tryRecord(base)
+                if (!(res && res.ok) && !base.includes('localhost')) {
+                    base = 'http://localhost:5000'
+                    res = await tryRecord(base)
+                }
+            } catch (_) {}
+
+            sendResponse({ ok: true })
         })
         return true
     }

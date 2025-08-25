@@ -6,7 +6,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Separator } from "../ui/separator";
-import { DollarSign, Lock, Map, Grid } from "lucide-react";
+import { DollarSign, Lock, Map, Grid, User } from "lucide-react";
 
 const platforms = [
   {
@@ -18,8 +18,8 @@ const platforms = [
     icon: Lock,
   },
   {
-    name: "Financials",
-    icon: DollarSign,
+    name: "Identity",
+    icon: User,
   },
   {
     name: "Addresses",

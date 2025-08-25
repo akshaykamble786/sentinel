@@ -1,7 +1,18 @@
-import { Edit, MoreHorizontal, Eye, Copy, Trash } from "lucide-react";
+import {
+  Edit,
+  MoreHorizontal,
+  Eye,
+  Copy,
+  Trash,
+  Edit2,
+  Calendar,
+  RefreshCcw,
+  Wand,
+  Wand2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { toast } from "sonner";
 import { getCredentialLogo } from "@/lib/utils";
 import {
@@ -20,9 +31,22 @@ import { AppContext } from "@/context/AppContext";
 export function PasswordDetails({ credential, onEdit, onDelete }) {
   const [showPassword, setShowPassword] = useState(false);
   const { categories } = useContext(AppContext);
+
+  useEffect(() => {
+    let timer;
+    if (showPassword) {
+      timer = setTimeout(() => {
+        setShowPassword(false);
+      }, 5000);
+    }
+    return () => clearTimeout(timer);
+  }, [showPassword]);
+
   if (!credential) return null;
 
-  const categoryObj = categories.find(cat => cat.name === credential.category);
+  const categoryObj = categories.find(
+    (cat) => cat.name === credential.category
+  );
   const categoryColor = categoryObj ? categoryObj.color : "#6366f1";
 
   return (
@@ -111,7 +135,9 @@ export function PasswordDetails({ credential, onEdit, onDelete }) {
           <label className="text-sm text-muted-foreground">Password</label>
           <div className="flex items-center justify-between mt-1">
             <div className="text-sm text-foreground">
-              {showPassword ? credential.password : "• • • • • • •"}
+              <span>
+                {showPassword ? credential.password : "• • • • • • •"}
+              </span>
             </div>
             <div className="flex items-center gap-1">
               <Button
@@ -129,6 +155,14 @@ export function PasswordDetails({ credential, onEdit, onDelete }) {
                 onClick={() => {
                   navigator.clipboard.writeText(credential.password);
                   toast.success("Password copied");
+
+                  setTimeout(async () => {
+                    try {
+                      await navigator.clipboard.writeText("");
+                    } catch (err) {
+                      console.error("Failed to clear clipboard:", err);
+                    }
+                  }, 3000);
                 }}
               >
                 <Copy className="h-3 w-3" />
@@ -146,11 +180,48 @@ export function PasswordDetails({ credential, onEdit, onDelete }) {
           </div>
         )}
 
-        <div className="pt-4 border-t border-border">
-          <div className="text-xs text-muted-foreground">
+        <div className="pt-4 border-t space-y-1 flex flex-col gap-1 space-y-2">
+          <div className="text-xs text-muted-foreground flex items-center gap-1">
+            <Calendar className="h-3 w-3 mr-1" />
+            Created:{" "}
+            {credential.createdAt
+              ? new Date(credential.createdAt)
+                  .toLocaleString("en-GB", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true,
+                  })
+              : "-"}
+          </div>
+          <div className="text-xs text-muted-foreground flex items-center gap-1">
+            <Edit2 className="h-3 w-3 mr-1" />
             Last modified:{" "}
             {credential.updatedAt
-              ? new Date(credential.updatedAt).toLocaleString()
+              ? new Date(credential.updatedAt).toLocaleString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              })
+              : "-"}
+          </div>
+          <div className="text-xs text-muted-foreground flex items-center gap-1">
+            <Wand2 className="h-3 w-3 mr-1" />
+            Last autofill:{" "}
+            {credential.lastAutofill
+              ? new Date(credential.lastAutofill).toLocaleString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              })
               : "-"}
           </div>
         </div>

@@ -67,6 +67,22 @@
     })
   }
 
+  async function recordAutofill(credential) {
+    return new Promise((resolve) => {
+      try {
+        chrome.runtime.sendMessage(
+          { type: 'RECORD_AUTOFILL', credential },
+          (response) => {
+            if (response && response.ok) resolve(true)
+            else resolve(false)
+          }
+        )
+      } catch (_) {
+        resolve(false)
+      }
+    })
+  }
+
   function getFieldRole(input) {
     const name = `${input.name || ''}`.toLowerCase()
     const id = `${input.id || ''}`.toLowerCase()
@@ -216,6 +232,7 @@
           passwordInput.focus()
           setInputValue(passwordInput, selected.password || '')
         }
+        recordAutofill({ site: location.origin, username: selected.username || '' })
       } catch (_) { }
       removeButton()
     })

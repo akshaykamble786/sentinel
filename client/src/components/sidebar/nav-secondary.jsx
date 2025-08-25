@@ -96,7 +96,7 @@ export function NavSecondary({ items, ...props }) {
               required
             >
               <option value="Logins">Logins</option>
-              <option value="Financials">Financials</option>
+              <option value="Identity">Identity</option>
               <option value="Addresses">Addresses</option>
             </select>
           </div>

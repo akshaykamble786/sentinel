@@ -151,3 +151,55 @@ export const searchCredentials = async (req, res) => {
         res.status(500).json({ success: false, message: 'Failed to search credentials.' });
     }
 }
+
+export const recordAutofill = async (req, res) => {
+    try {
+        const { site, username } = req.body;
+        if (!site) {
+            return res.status(400).json({ success: false, message: 'Missing site' });
+        }
+
+        // Normalize incoming origin hostname (strip www)
+        let originHost = null;
+        try {
+            originHost = new URL(site).hostname.replace(/^www\./, '');
+        } catch (_) {
+            originHost = site;
+        }
+
+        // Fetch user's credentials and find best match by hostname and optional username
+        const all = await Credential.find({ userId: req.userId }).sort({ updatedAt: -1 });
+        const candidates = all.filter((c) => {
+            try {
+                if (!c.site) return false;
+                const host = new URL(c.site).hostname.replace(/^www\./, '');
+                const hostMatches = host === originHost || host.endsWith('.' + originHost) || originHost.endsWith('.' + host);
+                const usernameMatches = typeof username === 'string' && username.trim() !== '' ? c.username === username : true;
+                return hostMatches && usernameMatches;
+            } catch (_) {
+                return false;
+            }
+        });
+
+        if (candidates.length === 0) {
+            return res.status(404).json({ success: false, message: 'Credential not found.' });
+        }
+
+        // Prefer exact hostname match; fallback to first candidate
+        const exact = candidates.find((c) => {
+            try {
+                return new URL(c.site).hostname.replace(/^www\./, '') === originHost;
+            } catch (_) {
+                return false;
+            }
+        });
+        const target = exact || candidates[0];
+
+        target.lastAutofill = new Date();
+        await target.save();
+
+        res.json({ success: true, credential: { ...target.toObject(), password: decrypt(target.password) } });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Failed to record autofill.' });
+    }
+}
